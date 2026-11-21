@@ -1,297 +1,400 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Play' }
+export const metadata: Metadata = { title: 'Play · Draft Day' }
 
-const GAME_MODES = [
+type GameMode = {
+  id: string
+  title: string
+  subtitle: string
+  desc: string
+  players: string
+  difficulty: 'ROOKIE' | 'PRO' | 'LEGEND'
+  xp: string
+  tag?: string
+  href: string
+  primaryColor: string
+  secondaryColor: string
+}
+
+const MODES: GameMode[] = [
   {
-    id: 'classic',
-    name: 'Classic Draft',
-    tagline: 'The Full Experience',
-    desc: 'Draft your player, build a career from high school through college and into the pros. Every season matters. Every decision shapes your legacy.',
-    accent: '#f97316',
-    badge: 'MOST POPULAR',
-    badgeColor: 'badge-orange',
-    icon: TrophyIcon,
-    stats: ['14 Game Seasons', 'Full Career Arc', 'Unlimited Saves'],
+    id: 'quick-draft',
+    title: 'QUICK DRAFT',
+    subtitle: 'Build a team, play now',
+    desc: 'Draft a squad from a random pool and jump into fast-paced action. No preparation needed — pure instinct and luck.',
+    players: '1v1',
+    difficulty: 'ROOKIE',
+    xp: '+150 XP',
+    tag: 'QUICK PLAY',
+    href: '/draft',
+    primaryColor: '#22c55e',
+    secondaryColor: '#16a34a',
   },
   {
-    id: 'daily',
-    name: 'Daily Draft',
-    tagline: 'Fresh Every Day',
-    desc: 'A new challenge drops every 24 hours. Compete globally with the same seed. Climb the daily leaderboard and earn exclusive rewards.',
-    accent: '#3b82f6',
-    badge: 'COMPETITIVE',
-    badgeColor: 'badge-navy',
-    icon: DailyIcon,
-    stats: ['Resets Daily', 'Global Rankings', 'Daily Rewards'],
+    id: 'ranked',
+    title: 'RANKED MATCH',
+    subtitle: 'Climb the leaderboards',
+    desc: 'Compete in a structured ranked ladder. Build your roster carefully — losses count. Rise from Bronze to Diamond.',
+    players: '1v1',
+    difficulty: 'PRO',
+    xp: '+500 XP',
+    tag: 'COMPETITIVE',
+    href: '/ranked',
+    primaryColor: '#f97316',
+    secondaryColor: '#ea580c',
   },
   {
-    id: 'position',
-    name: 'Position Draft',
-    tagline: 'Master Your Role',
-    desc: 'Go deep on a single position. Specialize in position-specific attributes, unlock unique archetypes, and become the ultimate specialist.',
-    accent: '#22c55e',
-    badge: 'SPECIALIST',
-    badgeColor: 'badge-green',
-    icon: PositionIcon,
-    stats: ['12 Positions', 'Deep Attributes', 'Unique Archetypes'],
+    id: 'career',
+    title: 'CAREER MODE',
+    subtitle: 'Build a dynasty',
+    desc: 'Start as an undrafted rookie and build your legacy over multiple seasons. Contracts, trades, retirements — it\'s the full journey.',
+    players: 'Solo',
+    difficulty: 'LEGEND',
+    xp: '+1,000 XP',
+    tag: 'FEATURED',
+    href: '/career',
+    primaryColor: '#a855f7',
+    secondaryColor: '#9333ea',
   },
   {
-    id: 'challenge',
-    name: 'Challenge Mode',
-    tagline: 'Beat the Constraints',
-    desc: 'Draft with special rules — limited spins, attribute restrictions, or position locks. Overcome the challenge and earn rare rewards.',
-    accent: '#f59e0b',
-    badge: 'HARD MODE',
-    badgeColor: 'badge-gold',
-    icon: ChallengeIcon,
-    stats: ['Weekly Rotations', 'Rare Rewards', 'Leaderboards'],
+    id: 'tournament',
+    title: 'TOURNAMENT',
+    subtitle: 'Weekly championships',
+    desc: 'Compete in time-limited tournaments with prizes. Each week a new format: snake draft, auction, mystery positions.',
+    players: '8-32 players',
+    difficulty: 'PRO',
+    xp: '+800 XP',
+    href: '/tournament',
+    primaryColor: '#f59e0b',
+    secondaryColor: '#d97706',
   },
   {
-    id: 'sandbox',
-    name: 'Sandbox',
-    tagline: 'No Rules. Pure Creativity.',
-    desc: 'Experiment freely. Unlimited spins, any position, any attributes. Build your dream player without any restrictions.',
-    accent: '#8b5cf6',
-    badge: 'FREE PLAY',
-    badgeColor: 'badge-navy',
-    icon: SandboxIcon,
-    stats: ['Unlimited Spins', 'Any Position', 'No Restrictions'],
+    id: 'training',
+    title: 'TRAINING GROUNDS',
+    subtitle: 'Sharpen your skills',
+    desc: 'Practice draft strategies in a no-stakes sandbox. Experiment with new positions, test attribute combos, and optimize your build.',
+    players: 'Solo',
+    difficulty: 'ROOKIE',
+    xp: '+75 XP',
+    href: '/training',
+    primaryColor: '#3b82f6',
+    secondaryColor: '#2563eb',
+  },
+  {
+    id: 'blitz',
+    title: 'BLITZ MODE',
+    subtitle: '5-minute fast draft',
+    desc: 'Speed drafting under pressure. 15 seconds per pick. No time to overthink — trust your gut and build fast.',
+    players: '1v1',
+    difficulty: 'PRO',
+    xp: '+300 XP',
+    tag: 'FAST',
+    href: '/blitz',
+    primaryColor: '#ec4899',
+    secondaryColor: '#db2777',
   },
 ]
 
-export default async function PlayPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+const DIFFICULTY_COLOR = {
+  ROOKIE: '#22c55e',
+  PRO:    '#f97316',
+  LEGEND: '#a855f7',
+}
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let activeCareer: any = null
-  if (user) {
-    const { data } = await supabase
-      .from('careers')
-      .select('*, players(*)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single()
-    activeCareer = data
-  }
+function FieldSVG({ color = '#f97316' }: { color?: string }) {
+  return (
+    <svg width="160" height="100" viewBox="0 0 160 100" fill="none" style={{ opacity: 0.6 }}>
+      {/* Field */}
+      <rect x="10" y="20" width="140" height="60" rx="4" stroke={color} strokeWidth="1" fill={`${color}08`}/>
+      {/* Yard lines */}
+      {[35,60,85,110,135].map(x => (
+        <line key={x} x1={x} y1="20" x2={x} y2="80" stroke={`${color}30`} strokeWidth="0.8" strokeDasharray="4 2"/>
+      ))}
+      {/* Yard numbers */}
+      {[['20',35],['50',60],['20',85]].map(([n, x]) => (
+        <text key={String(x)} x={x} y="90" textAnchor="middle" fontFamily="Barlow Condensed,sans-serif" fontWeight="700" fontSize="8" fill={`${color}40`}>{n}</text>
+      ))}
+      {/* End zones */}
+      <rect x="10" y="20" width="22" height="60" rx="4" fill={`${color}12`}/>
+      <rect x="128" y="20" width="22" height="60" rx="4" fill={`${color}12`}/>
+      {/* Players (xs and os) */}
+      {[[55,40],[65,50],[55,60],[75,45],[75,55]].map(([x,y], i) => (
+        <circle key={i} cx={x} cy={y} r="4" fill={`${color}40`} stroke={`${color}70`} strokeWidth="0.8"/>
+      ))}
+      {[[85,40],[95,50],[85,60],[105,45],[105,55]].map(([x,y], i) => (
+        <circle key={i+5} cx={x} cy={y} r="4" stroke={`${color}50`} strokeWidth="1" fill="none"/>
+      ))}
+      {/* Ball */}
+      <ellipse cx="80" cy="50" rx="5" ry="3" fill={color} opacity="0.5"/>
+    </svg>
+  )
+}
+
+function TrophySVG({ color = '#f59e0b' }: { color?: string }) {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style={{ opacity: 0.7 }}>
+      <path d="M28 16h24v24c0 8.8-7.2 16-16 16s-16-7.2-16-16V16z" stroke={color} strokeWidth="2" fill={`${color}15`}/>
+      <path d="M20 20c-6.6 0-8 10-8 10s4 2 8 2M60 20c6.6 0 8 10 8 10s-4 2-8 2" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M36 56v10M44 56v10M28 66h24" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M34 32l2 4 4.5-6 4 6 2-4" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+function LightningSVG({ color = '#f97316' }: { color?: string }) {
+  return (
+    <svg width="60" height="80" viewBox="0 0 60 80" fill="none" style={{ opacity: 0.7 }}>
+      <path d="M36 8L12 44h20L16 76l36-40H32L36 8z" fill={color} opacity="0.3" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+export default async function PlayPage() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const { data: profileData } = await supabase.from('profiles').select('level, xp').eq('id', user.id).single()
+  const profile = profileData as { level: number; xp: number } | null
+
+  const featured = MODES.find(m => m.tag === 'FEATURED') ?? MODES[0]
+  const others = MODES.filter(m => m.id !== featured.id)
 
   return (
-    <div style={{ padding: '2rem 1.5rem', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--navy-950)' }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--orange-400)', marginBottom: '0.4rem' }}>
-          Game Modes
-        </div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(2rem,4vw,3rem)', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: '0.5rem' }}>
-          Choose Your <span style={{ color: 'var(--orange-500)' }}>Mode</span>
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: 500 }}>Every mode, one goal — build a legend. Pick how you want to play.</p>
-      </div>
-
-      {/* Active career banner */}
-      {activeCareer && (
-        <div className="card" style={{ padding: '1.25rem 1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--orange-500)', background: 'rgba(249,115,22,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--orange-400)', marginBottom: '0.2rem' }}>⚡ Active Career</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
-              {activeCareer.players?.name || 'Your Player'} · {activeCareer.players?.position || 'QB'}
+      {/* PAGE HEADER */}
+      <div style={{
+        position: 'relative',
+        background: 'linear-gradient(135deg, #05080f 0%, #0a1020 100%)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        padding: '2.5rem 2rem 2rem',
+        overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'repeating-linear-gradient(90deg, white 0, white 1px, transparent 1px, transparent 60px), repeating-linear-gradient(0deg, white 0, white 1px, transparent 1px, transparent 60px)' }}/>
+        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem,5vw,3.5rem)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.02em', color: 'white' }}>
+                GAME MODES
+              </h1>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginTop: '8px', letterSpacing: '0.04em' }}>
+                SELECT A MODE AND GET IN THE GAME
+              </div>
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Season {activeCareer.season || 1} · {activeCareer.stage || 'College'} · OVR {activeCareer.players?.overall || 70}
-            </div>
-          </div>
-          <Link href={`/career/${activeCareer.id}`} className="btn btn-primary">Continue Career →</Link>
-        </div>
-      )}
-
-      {/* Featured mode (Classic) — large card */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        {GAME_MODES.slice(0, 1).map(mode => {
-          const Icon = mode.icon
-          return (
-            <div key={mode.id} className="card" style={{
-              padding: '2rem',
-              background: `linear-gradient(135deg, var(--navy-800) 0%, rgba(249,115,22,0.06) 100%)`,
-              borderTop: `4px solid ${mode.accent}`,
-              position: 'relative', overflow: 'hidden',
-            }}>
-              {/* Background pattern */}
+            {profile && (
               <div style={{
-                position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%',
-                background: `radial-gradient(ellipse at right, ${mode.accent}0a 0%, transparent 70%)`,
-                pointerEvents: 'none',
-              }} />
-
-              <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'flex-start', gap: '2rem', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: 260 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 'var(--r-md)', background: `${mode.accent}1a`, border: `1px solid ${mode.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon color={mode.accent} size={24} />
-                    </div>
-                    <div>
-                      <span className={`badge ${mode.badgeColor}`} style={{ fontSize: '0.6rem' }}>{mode.badge}</span>
-                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.6rem', textTransform: 'uppercase', letterSpacing: '0.02em', color: 'var(--text-primary)', lineHeight: 1 }}>
-                        {mode.name}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1rem', color: mode.accent, marginBottom: '0.75rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                    {mode.tagline}
-                  </div>
-                  <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.25rem', maxWidth: 440 }}>
-                    {mode.desc}
-                  </p>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                    {mode.stats.map(s => (
-                      <div key={s} className="badge badge-navy">{s}</div>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <Link href="/create-player" className="btn btn-primary btn-lg">
-                      Play Now →
-                    </Link>
-                    <Link href={`/play/${mode.id}`} className="btn btn-ghost btn-lg">Learn More</Link>
-                  </div>
+                padding: '12px 18px',
+                background: 'rgba(249,115,22,0.08)',
+                border: '1px solid rgba(249,115,22,0.2)',
+                borderRadius: '12px',
+              }}>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '22px', color: '#f97316', lineHeight: 1 }}>
+                  LVL {profile.level ?? 1}
                 </div>
-
-                {/* Field preview art */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ClassicModeSVG />
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', letterSpacing: '0.08em', color: 'rgba(249,115,22,0.6)', textTransform: 'uppercase' }}>
+                  YOUR LEVEL
                 </div>
               </div>
-            </div>
-          )
-        })}
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Other modes grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-        {GAME_MODES.slice(1).map(mode => {
-          const Icon = mode.icon
-          return (
-            <div key={mode.id} className="card card-hover" style={{
-              padding: '1.5rem', borderTop: `3px solid ${mode.accent}`,
-              background: 'var(--navy-900)', cursor: 'pointer',
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 2rem 4rem' }}>
+
+        {/* FEATURED MODE — full width spotlight */}
+        <div style={{ marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+            <div style={{ width: '4px', height: '20px', borderRadius: '2px', background: featured.primaryColor }}/>
+            <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>FEATURED MODE</span>
+            <div style={{ flex: 1, height: '1px', background: `${featured.primaryColor}20` }}/>
+          </div>
+
+          <Link href={featured.href} style={{ textDecoration: 'none', display: 'block' }}>
+            <div style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '32px',
+              padding: '36px 40px',
+              background: `linear-gradient(135deg, ${featured.primaryColor}12 0%, ${featured.secondaryColor}08 50%, rgba(5,8,15,0.6) 100%)`,
+              border: `1px solid ${featured.primaryColor}30`,
+              borderRadius: '24px',
+              overflow: 'hidden',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ width: 40, height: 40, borderRadius: 'var(--r-md)', background: `${mode.accent}1a`, border: `1px solid ${mode.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon color={mode.accent} size={20} />
+              {/* Background glow */}
+              <div style={{ position: 'absolute', top: '-80px', right: '5%', width: '350px', height: '350px', borderRadius: '50%', background: `radial-gradient(ellipse, ${featured.primaryColor}15 0%, transparent 70%)`, pointerEvents: 'none' }}/>
+
+              {/* SVG art */}
+              <div style={{ flexShrink: 0, opacity: 0.8 }}>
+                <TrophySVG color={featured.primaryColor}/>
+              </div>
+
+              <div style={{ flex: 1, position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                  <div style={{
+                    padding: '4px 12px',
+                    background: `${featured.primaryColor}20`,
+                    border: `1px solid ${featured.primaryColor}40`,
+                    borderRadius: '6px',
+                    fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '11px',
+                    letterSpacing: '0.15em', textTransform: 'uppercase', color: featured.primaryColor,
+                  }}>{featured.tag}</div>
+                  <div style={{
+                    padding: '4px 12px',
+                    background: `${DIFFICULTY_COLOR[featured.difficulty]}15`,
+                    border: `1px solid ${DIFFICULTY_COLOR[featured.difficulty]}30`,
+                    borderRadius: '6px',
+                    fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '11px',
+                    letterSpacing: '0.12em', textTransform: 'uppercase', color: DIFFICULTY_COLOR[featured.difficulty],
+                  }}>{featured.difficulty}</div>
                 </div>
-                <div>
-                  <span className={`badge ${mode.badgeColor}`} style={{ fontSize: '0.55rem' }}>{mode.badge}</span>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.1rem', textTransform: 'uppercase', color: 'var(--text-primary)', lineHeight: 1 }}>
-                    {mode.name}
+                <h2 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem,4vw,3.5rem)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.02em', color: 'white', marginBottom: '8px' }}>
+                  {featured.title}
+                </h2>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '16px', color: featured.primaryColor, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {featured.subtitle}
+                </div>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 500, fontSize: '15px', color: 'rgba(255,255,255,0.5)', maxWidth: '480px', lineHeight: 1.5 }}>
+                  {featured.desc}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '20px' }}>
+                  <div style={{ display: 'flex', gap: '16px' }}>
+                    <Stat label="PLAYERS" value={featured.players}/>
+                    <Stat label="XP REWARD" value={featured.xp} accent={featured.primaryColor}/>
+                  </div>
+                  <div style={{
+                    marginLeft: 'auto',
+                    padding: '14px 32px',
+                    background: featured.primaryColor,
+                    border: 'none',
+                    borderRadius: '14px',
+                    color: '#05080f',
+                    fontFamily: 'Barlow Condensed, sans-serif',
+                    fontWeight: 900, fontSize: '18px',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    boxShadow: `0 6px 24px ${featured.primaryColor}40`,
+                  }}>
+                    LAUNCH MODE →
                   </div>
                 </div>
               </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem', color: mode.accent, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                {mode.tagline}
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '1rem' }}>
-                {mode.desc}
-              </p>
-              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                {mode.stats.map(s => (
-                  <div key={s} className="badge badge-navy" style={{ fontSize: '0.6rem' }}>{s}</div>
-                ))}
-              </div>
-              <Link href="/create-player" className="btn btn-ghost btn-sm">
-                Play {mode.name} →
-              </Link>
             </div>
-          )
-        })}
+          </Link>
+        </div>
+
+        {/* ALL OTHER MODES — 2-column grid */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+          <div style={{ width: '4px', height: '20px', borderRadius: '2px', background: '#f97316' }}/>
+          <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>ALL MODES</span>
+          <div style={{ flex: 1, height: '1px', background: 'rgba(249,115,22,0.15)' }}/>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
+          {others.map((mode) => (
+            <ModeCard key={mode.id} mode={mode}/>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
-/* ── SVG ICONS ── */
-
-function TrophyIcon({ color = '#f97316', size = 24 }) {
+function ModeCard({ mode }: { mode: GameMode }) {
+  const diffColor = DIFFICULTY_COLOR[mode.difficulty]
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M6 4h12v8a6 6 0 01-12 0V4z" stroke={color} strokeWidth="1.8" fill={`${color}20`}/>
-      <path d="M6 7H3a3 3 0 003 3M18 7h3a3 3 0 01-3 3" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M12 18v3M9 21h6" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
+    <Link href={mode.href} style={{ textDecoration: 'none' }}>
+      <div style={{
+        position: 'relative',
+        padding: '24px',
+        background: `rgba(255,255,255,0.03)`,
+        border: `1px solid ${mode.primaryColor}20`,
+        borderRadius: '18px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        height: '100%',
+        boxSizing: 'border-box',
+      }}>
+        {/* Top accent bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(90deg, ${mode.primaryColor}, ${mode.secondaryColor})` }}/>
+
+        {/* BG glow */}
+        <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '150px', height: '150px', borderRadius: '50%', background: `radial-gradient(ellipse, ${mode.primaryColor}0a 0%, transparent 70%)`, pointerEvents: 'none' }}/>
+
+        {/* SVG preview */}
+        <div style={{ position: 'absolute', bottom: '12px', right: '12px', opacity: 0.4 }}>
+          <FieldSVG color={mode.primaryColor}/>
+        </div>
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {/* Tags row */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
+            <div style={{
+              padding: '3px 10px',
+              background: `${diffColor}15`,
+              border: `1px solid ${diffColor}30`,
+              borderRadius: '6px',
+              fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '10px',
+              letterSpacing: '0.12em', textTransform: 'uppercase', color: diffColor,
+            }}>{mode.difficulty}</div>
+            {mode.tag && (
+              <div style={{
+                padding: '3px 10px',
+                background: `${mode.primaryColor}15`,
+                border: `1px solid ${mode.primaryColor}30`,
+                borderRadius: '6px',
+                fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '10px',
+                letterSpacing: '0.12em', textTransform: 'uppercase', color: mode.primaryColor,
+              }}>{mode.tag}</div>
+            )}
+          </div>
+
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '26px', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.02em', color: 'white', marginBottom: '6px' }}>
+            {mode.title}
+          </div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', color: mode.primaryColor, marginBottom: '10px' }}>
+            {mode.subtitle}
+          </div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 500, fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, marginBottom: '20px', maxWidth: '240px' }}>
+            {mode.desc}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <Stat label="PLAYERS" value={mode.players} small/>
+              <Stat label="XP" value={mode.xp} accent={mode.primaryColor} small/>
+            </div>
+            <div style={{
+              padding: '8px 20px',
+              background: `${mode.primaryColor}15`,
+              border: `1px solid ${mode.primaryColor}30`,
+              borderRadius: '10px',
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 800, fontSize: '13px',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: mode.primaryColor,
+            }}>PLAY</div>
+          </div>
+        </div>
+      </div>
+    </Link>
   )
 }
 
-function DailyIcon({ color = '#3b82f6', size = 24 }) {
+function Stat({ label, value, accent, small }: { label: string; value: string; accent?: string; small?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="4" width="18" height="17" rx="2" stroke={color} strokeWidth="1.8" fill={`${color}15`}/>
-      <path d="M8 2v2M16 2v2M3 10h18" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  )
-}
-
-function PositionIcon({ color = '#22c55e', size = 24 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="4" stroke={color} strokeWidth="1.8" fill={`${color}20`}/>
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )
-}
-
-function ChallengeIcon({ color = '#f59e0b', size = 24 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M13 2L4 14h8l-1 8 9-12h-8l1-8z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" fill={`${color}20`}/>
-    </svg>
-  )
-}
-
-function SandboxIcon({ color = '#8b5cf6', size = 24 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M12 20V4M4 12h16" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-      <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.8" fill={`${color}10`}/>
-      <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="1.5" fill={`${color}30`}/>
-    </svg>
-  )
-}
-
-function ClassicModeSVG() {
-  /* Football field top-down view */
-  return (
-    <svg width="220" height="160" viewBox="0 0 220 160" fill="none">
-      {/* Field */}
-      <rect x="10" y="10" width="200" height="140" rx="6" fill="rgba(34,197,94,0.07)" stroke="rgba(34,197,94,0.15)" strokeWidth="1.5"/>
-      {/* Yard lines */}
-      {[40, 70, 110, 150, 180].map(x => (
-        <line key={x} x1={x} y1="10" x2={x} y2="150" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
-      ))}
-      {/* End zones */}
-      <rect x="10" y="10" width="30" height="140" rx="6" fill="rgba(249,115,22,0.08)" stroke="rgba(249,115,22,0.15)" strokeWidth="1"/>
-      <rect x="180" y="10" width="30" height="140" rx="6" fill="rgba(249,115,22,0.08)" stroke="rgba(249,115,22,0.15)" strokeWidth="1"/>
-      {/* Center circle */}
-      <circle cx="110" cy="80" r="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none"/>
-      {/* Player positions (dots) */}
-      <circle cx="110" cy="80" r="4" fill="var(--orange-500)"/>
-      <circle cx="90" cy="72" r="3" fill="rgba(255,255,255,0.4)"/>
-      <circle cx="90" cy="88" r="3" fill="rgba(255,255,255,0.4)"/>
-      <circle cx="80" cy="80" r="3" fill="rgba(255,255,255,0.4)"/>
-      <circle cx="75" cy="68" r="3" fill="rgba(255,255,255,0.4)"/>
-      <circle cx="75" cy="92" r="3" fill="rgba(255,255,255,0.4)"/>
-      <circle cx="130" cy="72" r="3" fill="rgba(59,130,246,0.6)"/>
-      <circle cx="130" cy="88" r="3" fill="rgba(59,130,246,0.6)"/>
-      <circle cx="140" cy="80" r="3" fill="rgba(59,130,246,0.6)"/>
-      <circle cx="145" cy="68" r="3" fill="rgba(59,130,246,0.6)"/>
-      <circle cx="145" cy="92" r="3" fill="rgba(59,130,246,0.6)"/>
-      {/* Route arrows */}
-      <path d="M110 80 C120 60 140 55 155 50" stroke="rgba(249,115,22,0.6)" strokeWidth="1.5" fill="none" strokeDasharray="4 3"/>
-      <path d="M110 80 C115 100 130 108 145 112" stroke="rgba(249,115,22,0.4)" strokeWidth="1.5" fill="none" strokeDasharray="4 3"/>
-      {/* DD label */}
-      <text x="110" y="145" textAnchor="middle" fontFamily="Barlow Condensed,sans-serif" fontWeight="700" fontSize="10" fill="rgba(249,115,22,0.4)" letterSpacing="0.1em">DRAFT DAY</text>
-    </svg>
+    <div>
+      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: small ? '10px' : '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', lineHeight: 1 }}>
+        {label}
+      </div>
+      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: small ? '15px' : '20px', color: accent ?? 'white', lineHeight: 1.1 }}>
+        {value}
+      </div>
+    </div>
   )
 }
