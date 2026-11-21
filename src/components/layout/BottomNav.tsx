@@ -2,55 +2,97 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Trophy, Zap, Star, User, ShoppingBag } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface BottomNavProps {
   user: SupabaseUser | null
 }
 
+const links = (user: SupabaseUser | null) => [
+  { href: '/',          label: 'Home',    icon: '🏠' },
+  { href: '/career',    label: 'Career',  icon: '🏈' },
+  { href: '/play',      label: 'Play',    icon: '⚡', highlight: true },
+  { href: '/leaderboards', label: 'Ranks', icon: '🏆' },
+  { href: user ? '/profile' : '/auth/login', label: user ? 'Profile' : 'Login', icon: '👤' },
+]
+
 export function BottomNav({ user }: BottomNavProps) {
   const pathname = usePathname()
-
-  const links = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/career', label: 'Career', icon: Trophy },
-    { href: '/play', label: 'Play', icon: Zap, highlight: true },
-    { href: '/leaderboards', label: 'Ranks', icon: Star },
-    { href: user ? '/profile' : '/auth/login', label: user ? 'Profile' : 'Sign In', icon: User },
-  ]
+  const navLinks = links(user)
 
   return (
-    <div className="bottom-nav md:hidden">
-      <div className="flex items-center justify-around px-2 py-2">
-        {links.map(({ href, label, icon: Icon, highlight }) => {
-          const active = pathname === href
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
-                highlight
-                  ? active
-                    ? 'bg-brand-500/30 text-brand-400'
-                    : 'bg-brand-500/15 text-brand-400'
-                  : active
-                    ? 'text-brand-400'
-                    : 'text-gray-500'
-              }`}
-            >
-              {highlight ? (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center shadow-lg shadow-brand-500/30 -mt-5">
-                  <Icon size={18} className="text-white" />
-                </div>
-              ) : (
-                <Icon size={20} />
-              )}
-              <span className={`text-xs font-medium ${highlight ? 'mt-1' : ''}`}>{label}</span>
-            </Link>
-          )
-        })}
-      </div>
+    <div style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0,
+      background: 'rgba(7, 20, 40, 0.95)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      borderTop: '1px solid var(--border)',
+      display: 'flex',
+      alignItems: 'stretch',
+      zIndex: 40,
+      paddingBottom: 'env(safe-area-inset-bottom)',
+    }}
+      className="bottom-nav-mobile"
+    >
+      {navLinks.map(({ href, label, icon, highlight }) => {
+        const active = pathname === href || (href !== '/' && pathname.startsWith(href))
+        return (
+          <Link
+            key={href}
+            href={href}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '3px',
+              padding: highlight ? '0.5rem 0.5rem 0.75rem' : '0.6rem 0.5rem 0.75rem',
+              color: active ? 'var(--accent)' : 'var(--charcoal-400)',
+              position: 'relative',
+            }}
+          >
+            {highlight ? (
+              <div style={{
+                width: 42, height: 42,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--orange-600), var(--orange-400))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginTop: -16,
+                boxShadow: '0 4px 16px rgba(249,115,22,0.4)',
+                fontSize: '1.1rem',
+              }}>
+                {icon}
+              </div>
+            ) : (
+              <span style={{ fontSize: '1.1rem' }}>{icon}</span>
+            )}
+            <span style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 700,
+              fontSize: '0.6rem',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              marginTop: highlight ? 2 : 0,
+            }}>{label}</span>
+            {active && !highlight && (
+              <div style={{
+                position: 'absolute', bottom: 0, left: '50%',
+                transform: 'translateX(-50%)',
+                width: 20, height: 2,
+                background: 'var(--accent)',
+                borderRadius: '2px 2px 0 0',
+              }} />
+            )}
+          </Link>
+        )
+      })}
+
+      <style>{`
+        @media (min-width: 768px) {
+          .bottom-nav-mobile { display: none !important; }
+        }
+      `}</style>
     </div>
   )
 }

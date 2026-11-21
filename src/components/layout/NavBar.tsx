@@ -3,13 +3,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import {
-  Home, User, Trophy, ShoppingBag, Users, Target,
-  Star, Settings, ChevronDown, LogOut, Zap, Menu, X
-} from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import DraftDayLogo from './DraftDayLogo'
 
 interface NavBarProps {
   user: SupabaseUser | null
@@ -24,6 +21,17 @@ interface NavBarProps {
   } | null
 }
 
+const NAV_LINKS = [
+  { href: '/',            label: 'Home' },
+  { href: '/career',     label: 'Career' },
+  { href: '/play',       label: 'Play' },
+  { href: '/leaderboards', label: 'Ranks' },
+  { href: '/friends',    label: 'Friends' },
+  { href: '/challenges', label: 'Challenges' },
+  { href: '/battle-pass', label: 'Battle Pass' },
+  { href: '/shop',       label: 'Shop' },
+]
+
 export function NavBar({ user, profile }: NavBarProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -37,197 +45,224 @@ export function NavBar({ user, profile }: NavBarProps) {
     router.refresh()
   }
 
-  const navLinks = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/career', label: 'Career', icon: Trophy },
-    { href: '/play', label: 'Play', icon: Zap },
-    { href: '/leaderboards', label: 'Ranks', icon: Star },
-    { href: '/friends', label: 'Friends', icon: Users },
-  ]
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-brand-500/20 h-16">
-      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-4">
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+      background: 'rgba(7, 20, 40, 0.92)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      borderBottom: '1px solid var(--border)',
+      height: 60,
+    }}>
+      <div style={{
+        maxWidth: 1280, margin: '0 auto',
+        height: '100%', display: 'flex',
+        alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 1.25rem', gap: '1rem',
+      }}>
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center">
-            <span className="font-display font-900 text-xs text-white">DD</span>
-          </div>
-          <span className="font-display font-800 text-lg text-white tracking-wide hide-mobile">
-            DRAFT DAY
-          </span>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <DraftDayLogo size={34} variant="full" />
         </Link>
 
-        {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center gap-1">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                pathname === href
-                  ? 'bg-brand-500/20 text-brand-400'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
-          <Link
-            href="/challenges"
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              pathname === '/challenges' ? 'bg-brand-500/20 text-brand-400' : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Challenges
-          </Link>
-          <Link
-            href="/battle-pass"
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              pathname === '/battle-pass' ? 'bg-brand-500/20 text-brand-400' : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Battle Pass
-          </Link>
-          <Link
-            href="/shop"
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              pathname === '/shop' ? 'bg-brand-500/20 text-brand-400' : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Shop
-          </Link>
+        {/* Desktop nav */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.125rem', flex: 1, justifyContent: 'center' }}
+             className="desktop-nav">
+          {NAV_LINKS.slice(0, 6).map(({ href, label }) => {
+            const isActive = pathname === href || (href !== '/' && pathname.startsWith(href))
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  borderRadius: 'var(--r-md)',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  color: isActive ? 'var(--accent)' : 'var(--charcoal-200)',
+                  background: isActive ? 'rgba(249,115,22,0.1)' : 'transparent',
+                  transition: 'all 0.15s',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {label}
+              </Link>
+            )
+          })}
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
           {user && profile ? (
             <>
               {/* Coins */}
-              <div className="coin-badge hide-mobile">
-                <span>🪙</span>
-                <span>{profile.coins.toLocaleString()}</span>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: 'var(--navy-800)', border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)', padding: '0.3rem 0.75rem',
+                fontFamily: 'var(--font-display)', fontWeight: 700,
+                fontSize: '0.85rem', color: 'var(--orange-300)',
+              }}
+                className="hide-mobile">
+                🪙 {profile.coins.toLocaleString()}
               </div>
 
-              {/* Profile dropdown */}
-              <div className="relative">
+              {/* Profile */}
+              <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-all"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                    background: profileOpen ? 'var(--navy-700)' : 'var(--navy-800)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    padding: '0.35rem 0.75rem 0.35rem 0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center text-xs font-bold text-white">
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--orange-600), var(--orange-400))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--font-display)', fontWeight: 800,
+                    fontSize: '0.8rem', color: 'white',
+                    flexShrink: 0,
+                  }}>
                     {(profile.display_name || profile.username)[0].toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-300 hide-mobile">
+                  <span style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 700,
+                    fontSize: '0.8rem', color: 'var(--charcoal-100)',
+                  }} className="hide-mobile">
                     {profile.display_name || profile.username}
                   </span>
-                  <ChevronDown size={14} className="text-gray-500 hide-mobile" />
+                  <span style={{ color: 'var(--charcoal-400)', fontSize: '0.65rem' }}>▾</span>
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-48 glass border border-brand-500/20 rounded-xl overflow-hidden shadow-2xl">
-                    <Link
-                      href="/profile"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-all"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      <User size={15} />
-                      My Profile
-                    </Link>
-                    <Link
-                      href="/create-player"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-all"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      <Zap size={15} />
-                      Create Player
-                    </Link>
-                    <Link
-                      href="/shop"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-all"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      <ShoppingBag size={15} />
-                      Shop
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-all"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      <Settings size={15} />
-                      Settings
-                    </Link>
-                    <div className="border-t border-white/5 mt-1" />
+                  <div style={{
+                    position: 'absolute', right: 0, top: 'calc(100% + 6px)',
+                    width: 192,
+                    background: 'var(--navy-800)',
+                    border: '1px solid var(--border-strong)',
+                    borderRadius: 'var(--r-xl)',
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 60px rgba(4,12,30,0.8)',
+                    zIndex: 100,
+                  }}>
+                    {[
+                      { href: '/profile', label: 'My Profile', emoji: '👤' },
+                      { href: '/create-player', label: 'New Player', emoji: '⚡' },
+                      { href: '/settings', label: 'Settings', emoji: '⚙️' },
+                    ].map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '0.65rem',
+                          padding: '0.7rem 1rem',
+                          fontFamily: 'var(--font-display)', fontWeight: 700,
+                          fontSize: '0.85rem',
+                          color: 'var(--charcoal-100)',
+                          transition: 'all 0.15s',
+                        }}
+                        onClick={() => setProfileOpen(false)}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                      >
+                        <span>{item.emoji}</span> {item.label}
+                      </Link>
+                    ))}
+                    <div style={{ borderTop: '1px solid var(--border)', margin: '0.25rem 0' }} />
                     <button
                       onClick={signOut}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-all"
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: '0.65rem',
+                        padding: '0.7rem 1rem',
+                        fontFamily: 'var(--font-display)', fontWeight: 700,
+                        fontSize: '0.85rem',
+                        color: '#fca5a5',
+                        background: 'transparent',
+                        border: 'none', cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                     >
-                      <LogOut size={15} />
-                      Sign Out
+                      🚪 Sign Out
                     </button>
                   </div>
                 )}
               </div>
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/auth/login"
-                className="btn btn-ghost text-sm px-4 py-2"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="btn btn-primary text-sm px-4 py-2"
-              >
-                Sign Up
-              </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Link href="/auth/login" className="btn btn-ghost btn-sm">Sign In</Link>
+              <Link href="/auth/signup" className="btn btn-primary btn-sm">Sign Up</Link>
             </div>
           )}
 
-          {/* Mobile menu button */}
+          {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-white/5 text-gray-400"
             onClick={() => setMenuOpen(!menuOpen)}
+            className="mobile-menu-btn"
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'var(--charcoal-200)', padding: '0.4rem', display: 'none',
+            }}
+            aria-label="Menu"
           >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? '✕' : '☰'}
           </button>
         </div>
       </div>
 
-      {/* Mobile full menu */}
+      {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 glass-dark border-b border-brand-500/20 py-4 px-4 space-y-1">
-          {[...navLinks,
-            { href: '/challenges', label: 'Challenges', icon: Target },
-            { href: '/battle-pass', label: 'Battle Pass', icon: Star },
-            { href: '/shop', label: 'Shop', icon: ShoppingBag },
-            { href: '/create-player', label: 'Create Player', icon: Zap },
-          ].map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                pathname === href ? 'bg-brand-500/20 text-brand-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-              onClick={() => setMenuOpen(false)}
-            >
-              <Icon size={16} />
-              {label}
-            </Link>
-          ))}
-          {user && profile && (
-            <div className="pt-2 border-t border-white/5">
-              <div className="coin-badge ml-4 mb-2">
-                <span>🪙</span>
-                <span>{profile.coins.toLocaleString()} coins</span>
-              </div>
-            </div>
-          )}
+        <div style={{
+          position: 'absolute', top: 60, left: 0, right: 0,
+          background: 'var(--navy-900)', borderBottom: '1px solid var(--border)',
+          padding: '1rem',
+        }}>
+          {NAV_LINKS.map(({ href, label }) => {
+            const isActive = pathname === href || (href !== '/' && pathname.startsWith(href))
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  display: 'block',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--r-md)',
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '1rem', textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  color: isActive ? 'var(--accent)' : 'var(--charcoal-200)',
+                  background: isActive ? 'rgba(249,115,22,0.1)' : 'transparent',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                {label}
+              </Link>
+            )
+          })}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 900px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+        }
+        @media (max-width: 600px) {
+          .hide-mobile { display: none !important; }
+        }
+      `}</style>
     </nav>
   )
 }

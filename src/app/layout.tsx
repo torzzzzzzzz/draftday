@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0a0e0c',
+  themeColor: '#040c1e',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -42,7 +42,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   let profile = null
@@ -59,7 +59,7 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <NavBar user={user} profile={profile} />
-        <main className="min-h-screen pb-20 md:pb-0 md:pt-16">
+        <main style={{ minHeight: '100vh', paddingTop: 60 }}>
           {children}
         </main>
         <footer className="hidden md:block border-t border-white/5 py-6 mt-8">
