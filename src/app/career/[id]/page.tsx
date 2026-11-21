@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Trophy, Zap, Calendar, TrendingUp, ChevronLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Career Details' }
+export const metadata: Metadata = { title: 'Career Details · Draft Day' }
 
 const STAGE_ORDER = ['high_school', 'college', 'nfl', 'retired']
 const STAGE_LABEL: Record<string, string> = {
@@ -12,6 +11,89 @@ const STAGE_LABEL: Record<string, string> = {
   college: 'College',
   nfl: 'NFL',
   retired: 'Retired',
+}
+
+function StatBar({ value, max = 99, color = 'var(--green-500)' }: { value: number; max?: number; color?: string }) {
+  return (
+    <div style={{ height: 4, background: 'var(--navy-700)', borderRadius: 999, overflow: 'hidden' }}>
+      <div style={{
+        height: '100%', width: `${(value / max) * 100}%`,
+        background: color, borderRadius: 999,
+        transition: 'width 0.5s ease',
+      }} />
+    </div>
+  )
+}
+
+function AwardBadge({ label, color, count }: { label: string; color: string; count: number }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0.625rem 0.875rem',
+      background: `${color}10`, border: `1px solid ${color}30`,
+      borderRadius: '0.5rem',
+    }}>
+      <span style={{ fontSize: '0.8rem', color: 'var(--charcoal-200)', fontWeight: 600 }}>{label}</span>
+      <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.9rem', color }}>
+        ×{count}
+      </span>
+    </div>
+  )
+}
+
+function LargePlayerArtSVG({ position, overall, color }: { position: string; overall: number; color: string }) {
+  const ovrColor = overall >= 90 ? '#22c55e' : overall >= 80 ? '#3b82f6' : overall >= 70 ? '#f59e0b' : '#f97316'
+
+  // Position-specific jersey number
+  const num = position === 'QB' ? '1' : position === 'WR' ? '11' : position === 'RB' ? '21' :
+               position === 'TE' ? '84' : position === 'OL' ? '72' : position === 'DE' ? '99' :
+               position === 'DT' ? '91' : position === 'LB' ? '55' : position === 'CB' ? '24' :
+               position === 'S' ? '32' : '50'
+
+  return (
+    <svg width="160" height="220" viewBox="0 0 160 220" fill="none">
+      {/* Glow */}
+      <ellipse cx="80" cy="200" rx="60" ry="12" fill={color} opacity="0.15"/>
+      {/* Body/jersey */}
+      <path d="M40 100 L30 60 L50 50 L60 70 L80 65 L100 70 L110 50 L130 60 L120 100 L115 160 L45 160 Z"
+        fill={color} opacity="0.9"/>
+      {/* Jersey stripe */}
+      <path d="M42 100 L45 160 L115 160 L118 100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" fill="none"/>
+      {/* Helmet */}
+      <ellipse cx="80" cy="45" rx="28" ry="26" fill={color}/>
+      <ellipse cx="80" cy="45" rx="28" ry="26" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" fill="none"/>
+      {/* Facemask */}
+      <path d="M54 45 L54 60 M58 48 L58 65 M62 50 L62 67"
+        stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Visor */}
+      <path d="M54 42 Q80 52 106 42" fill="rgba(0,0,0,0.3)" stroke="none"/>
+      {/* Shoulder pads */}
+      <path d="M28 75 Q40 65 60 68 L58 90 Q40 88 25 85 Z" fill={color} opacity="0.8"/>
+      <path d="M132 75 Q120 65 100 68 L102 90 Q120 88 135 85 Z" fill={color} opacity="0.8"/>
+      {/* Arms */}
+      <path d="M25 85 L18 130 L35 130 L40 90" fill={color} opacity="0.7"/>
+      <path d="M135 85 L142 130 L125 130 L120 90" fill={color} opacity="0.7"/>
+      {/* Gloves */}
+      <ellipse cx="26" cy="135" rx="10" ry="8" fill={color} opacity="0.8"/>
+      <ellipse cx="134" cy="135" rx="10" ry="8" fill={color} opacity="0.8"/>
+      {/* Pants */}
+      <path d="M45 160 L40 200 L60 200 L80 175 L100 200 L120 200 L115 160 Z"
+        fill="var(--navy-700)"/>
+      {/* Number */}
+      <text x="80" y="135" textAnchor="middle" fill="rgba(255,255,255,0.9)"
+        fontSize="28" fontWeight="900" fontFamily="var(--font-display)">{num}</text>
+      {/* OVR badge */}
+      <rect x="2" y="2" width="36" height="36" rx="6" fill="var(--navy-900)" stroke={ovrColor} strokeWidth="1.5"/>
+      <text x="20" y="17" textAnchor="middle" fill={ovrColor} fontSize="13" fontWeight="900"
+        fontFamily="var(--font-display)">{overall}</text>
+      <text x="20" y="29" textAnchor="middle" fill={ovrColor} fontSize="8" fontWeight="700"
+        fontFamily="var(--font-display)" opacity="0.7">OVR</text>
+      {/* POS badge */}
+      <rect x="122" y="2" width="36" height="20" rx="4" fill="rgba(255,255,255,0.08)"/>
+      <text x="140" y="15" textAnchor="middle" fill="var(--charcoal-200)" fontSize="9" fontWeight="700"
+        fontFamily="var(--font-display)">{position}</text>
+    </svg>
+  )
 }
 
 export default async function CareerDetailPage({ params }: { params: { id: string } }) {
@@ -39,190 +121,279 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
 
   const player = career.players as any
   const stageIndex = STAGE_ORDER.indexOf(career.stage)
+  const playerColor = player.primary_color || 'var(--orange-500)'
 
-  const wins = recentGames?.filter(g => g.won).length ?? 0
-  const losses = (recentGames?.length ?? 0) - wins
+  const totalGames = (career.season_wins ?? 0) + (career.season_losses ?? 0)
+  const winPct = totalGames > 0 ? Math.round((career.season_wins / totalGames) * 100) : 0
+
+  // Build attribute display
+  const attrs: Array<{ label: string; value: number; category: string }> = []
+  if (player.speed)         attrs.push({ label: 'Speed',         value: player.speed,         category: 'Physical' })
+  if (player.strength)      attrs.push({ label: 'Strength',      value: player.strength,      category: 'Physical' })
+  if (player.agility)       attrs.push({ label: 'Agility',       value: player.agility,       category: 'Physical' })
+  if (player.awareness)     attrs.push({ label: 'Awareness',     value: player.awareness,     category: 'Mental' })
+  if (player.throw_power)   attrs.push({ label: 'Throw Power',   value: player.throw_power,   category: 'Skill' })
+  if (player.throw_accuracy) attrs.push({ label: 'Accuracy',    value: player.throw_accuracy, category: 'Skill' })
+  if (player.catching)      attrs.push({ label: 'Catching',      value: player.catching,      category: 'Skill' })
+  if (player.route_running) attrs.push({ label: 'Route Running', value: player.route_running, category: 'Skill' })
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Link href="/career" className="btn btn-ghost p-2">
-          <ChevronLeft size={18} />
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
+      {/* Back + header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <Link href="/career" className="btn btn-ghost" style={{ padding: '0.5rem 0.875rem', flexShrink: 0 }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 4 }}>
+            <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Back
         </Link>
-        <div>
-          <div className="text-xs text-gray-500">Career Details</div>
-          <h1 className="font-display text-3xl font-800 text-white">{player.name}</h1>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.7rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--orange-400)', textTransform: 'uppercase' }}>
+            {STAGE_LABEL[career.stage]} · Year {career.current_year ?? 1}
+          </div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(1.75rem,5vw,2.5rem)', color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+            {player.name}
+          </h1>
         </div>
-        <Link href={`/play/simple?career=${career.id}`} className="btn btn-primary ml-auto">
+        <Link href={`/play/simple?career=${career.id}`} className="btn btn-primary" style={{ flexShrink: 0 }}>
           Play Next Game →
         </Link>
       </div>
 
-      {/* Career stage progress */}
-      <div className="card p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      {/* Stage progress */}
+      <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           {STAGE_ORDER.map((stage, i) => (
-            <div key={stage} className="flex items-center">
-              <div className={`flex flex-col items-center ${i <= stageIndex ? 'opacity-100' : 'opacity-30'}`}>
-                <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg ${
-                  i < stageIndex ? 'bg-orange-500 border-orange-500' :
-                  i === stageIndex ? 'border-orange-500 bg-orange-500/20' :
-                  'border-white/10 bg-white/5'
-                }`}>
-                  {i < stageIndex ? '✓' :
-                   stage === 'high_school' ? '🏫' :
-                   stage === 'college' ? '🎓' :
-                   stage === 'nfl' ? '🏈' : '🏛️'}
+            <div key={stage} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', flex: 1 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: i < stageIndex ? 'var(--orange-500)' : i === stageIndex ? 'rgba(249,115,22,0.15)' : 'var(--navy-700)',
+                  border: i <= stageIndex ? '2px solid var(--orange-500)' : '2px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  {i < stageIndex ? (
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M2 7l4 4 6-7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  ) : (
+                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.65rem', color: i === stageIndex ? 'var(--orange-400)' : 'var(--charcoal-500)' }}>
+                      {i + 1}
+                    </span>
+                  )}
                 </div>
-                <div className={`text-xs mt-1 font-medium ${i === stageIndex ? 'text-orange-400' : 'text-gray-500'}`}>
+                <span style={{ fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700, color: i === stageIndex ? 'var(--orange-400)' : 'var(--charcoal-500)', textAlign: 'center' }}>
                   {STAGE_LABEL[stage]}
-                </div>
+                </span>
               </div>
               {i < STAGE_ORDER.length - 1 && (
-                <div className={`h-0.5 w-8 sm:w-16 mx-2 ${i < stageIndex ? 'bg-orange-500' : 'bg-white/10'}`} />
+                <div style={{ height: 2, flex: 2, background: i < stageIndex ? 'var(--orange-500)' : 'var(--border)', marginBottom: '1.25rem' }} />
               )}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Player card */}
-        <div className="space-y-4">
-          <div className="card p-5">
-            <div
-              className="w-full aspect-square rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: `${player.primary_color}22` }}
-            >
-              <div className="text-center">
-                <div className="text-7xl font-display font-900" style={{ color: player.primary_color }}>
-                  #{player.jersey_number}
+      {/* Main grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '1.5rem' }}>
+        {/* Left: Player card */}
+        <div>
+          {/* Large player art */}
+          <div className="card" style={{
+            padding: '1.5rem',
+            background: `linear-gradient(160deg, var(--navy-800) 0%, ${playerColor}18 100%)`,
+            border: `1px solid ${playerColor}30`,
+            textAlign: 'center',
+            marginBottom: '1rem',
+          }}>
+            <LargePlayerArtSVG
+              position={player.position}
+              overall={player.overall}
+              color={playerColor}
+            />
+            <div style={{ marginTop: '1rem' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.25rem', color: '#fff', lineHeight: 1 }}>
+                {player.name}
+              </div>
+              {player.nickname && (
+                <div style={{ fontSize: '0.8rem', color: 'var(--charcoal-400)', marginTop: '0.25rem', fontStyle: 'italic' }}>
+                  &ldquo;{player.nickname}&rdquo;
                 </div>
-                <div className="text-sm font-display font-700 text-gray-400">{player.position}</div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+                <span style={{
+                  background: `${playerColor}20`, border: `1px solid ${playerColor}40`,
+                  padding: '0.2rem 0.6rem', borderRadius: '0.375rem',
+                  fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem', color: playerColor,
+                }}>{player.position}</span>
+                {career.nfl_team && (
+                  <span style={{
+                    background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)',
+                    padding: '0.2rem 0.6rem', borderRadius: '0.375rem',
+                    fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem', color: 'var(--gold-400)',
+                  }}>{career.nfl_team}</span>
+                )}
               </div>
-            </div>
-            <div className="text-center">
-              <h2 className="font-display font-800 text-2xl text-white">{player.name}</h2>
-              {player.nickname && <p className="text-gray-400 text-sm">"{player.nickname}"</p>}
-              <div
-                className="text-6xl font-display font-900 my-2"
-                style={{ color: player.overall >= 85 ? '#25a56e' : '#fbbf24' }}
-              >
-                {player.overall}
-              </div>
-              <div className="text-xs text-gray-500">Overall Rating</div>
             </div>
           </div>
 
           {/* Accolades */}
-          <div className="card p-4">
-            <h3 className="font-display font-700 text-sm text-gray-400 uppercase tracking-wider mb-3">Accolades</h3>
-            <div className="space-y-2">
-              {career.super_bowl_wins > 0 && (
-                <div className="flex items-center gap-2 text-sm text-amber-400">
-                  <Trophy size={14} /> {career.super_bowl_wins}× Super Bowl Champion
-                </div>
-              )}
-              {career.mvp_awards > 0 && (
-                <div className="flex items-center gap-2 text-sm text-blue-400">
-                  ⭐ {career.mvp_awards}× MVP Award
-                </div>
-              )}
-              {career.pro_bowl_selections > 0 && (
-                <div className="flex items-center gap-2 text-sm text-purple-400">
-                  🌟 {career.pro_bowl_selections}× Pro Bowl
-                </div>
-              )}
-              {career.all_pro_selections > 0 && (
-                <div className="flex items-center gap-2 text-sm text-orange-400">
-                  🏆 {career.all_pro_selections}× All-Pro
-                </div>
-              )}
+          <div className="card" style={{ padding: '1rem' }}>
+            <div style={{ fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--charcoal-400)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              Accolades
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {career.super_bowl_wins > 0 && <AwardBadge label="Super Bowl" color="var(--gold-500)" count={career.super_bowl_wins} />}
+              {career.mvp_awards > 0 && <AwardBadge label="MVP Award" color="#60a5fa" count={career.mvp_awards} />}
+              {career.pro_bowl_selections > 0 && <AwardBadge label="Pro Bowl" color="#c084fc" count={career.pro_bowl_selections} />}
+              {career.all_pro_selections > 0 && <AwardBadge label="All-Pro" color="var(--orange-400)" count={career.all_pro_selections} />}
               {career.hall_of_fame && (
-                <div className="flex items-center gap-2 text-sm text-purple-300">
-                  🏛️ Hall of Fame Inductee
+                <div style={{
+                  padding: '0.625rem 0.875rem',
+                  background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.3)',
+                  borderRadius: '0.5rem',
+                  fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.8rem', color: '#c084fc',
+                }}>
+                  Hall of Fame
                 </div>
               )}
-              {!career.super_bowl_wins && !career.mvp_awards && !career.pro_bowl_selections && (
-                <p className="text-xs text-gray-600">No accolades yet. Keep playing!</p>
+              {!career.super_bowl_wins && !career.mvp_awards && !career.pro_bowl_selections && !career.hall_of_fame && (
+                <p style={{ fontSize: '0.75rem', color: 'var(--charcoal-500)', textAlign: 'center', padding: '0.5rem 0' }}>
+                  No accolades yet — keep winning
+                </p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Stats & games */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Season info */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="card p-4 text-center">
-              <div className="text-2xl font-display font-900 text-white">{career.current_year}</div>
-              <div className="text-xs text-gray-500">Year</div>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl font-display font-900 text-orange-400">{career.season_wins ?? 0}</div>
-              <div className="text-xs text-gray-500">Season Wins</div>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl font-display font-900 text-red-400">{career.season_losses ?? 0}</div>
-              <div className="text-xs text-gray-500">Season Losses</div>
-            </div>
+        {/* Right: stats & games */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Season stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+            {[
+              { label: 'Year', value: career.current_year ?? 1, color: '#fff' },
+              { label: 'W-L', value: `${career.season_wins ?? 0}-${career.season_losses ?? 0}`, color: 'var(--green-400)' },
+              { label: 'Win %', value: `${winPct}%`, color: 'var(--orange-400)' },
+              { label: 'Rep', value: `${career.reputation_score ?? 0}`, color: 'var(--gold-400)' },
+            ].map((stat) => (
+              <div key={stat.label} className="card" style={{ padding: '1rem', textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.5rem', color: stat.color, lineHeight: 1 }}>
+                  {stat.value}
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--charcoal-500)', marginTop: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
 
+          {/* Attributes */}
+          {attrs.length > 0 && (
+            <div className="card" style={{ padding: '1.25rem' }}>
+              <div style={{ fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--charcoal-400)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
+                Attributes
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                {attrs.map((attr) => {
+                  const barColor = attr.value >= 90 ? '#22c55e' : attr.value >= 80 ? '#3b82f6' : attr.value >= 70 ? '#f59e0b' : '#f97316'
+                  return (
+                    <div key={attr.label}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--charcoal-200)' }}>{attr.label}</span>
+                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem', color: barColor }}>
+                          {attr.value}
+                        </span>
+                      </div>
+                      <StatBar value={attr.value} color={barColor} />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Recent games */}
-          <div className="card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-700 text-lg text-white">Recent Games</h3>
-              <span className="text-xs text-gray-500">Last 5</span>
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
+              <div style={{ fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--charcoal-400)', textTransform: 'uppercase' }}>
+                Recent Games
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--charcoal-500)' }}>Last 5</span>
             </div>
             {recentGames && recentGames.length > 0 ? (
-              <div className="space-y-2">
-                {recentGames.map((game, i) => (
-                  <div key={game.id} className={`flex items-center gap-3 p-3 rounded-xl ${game.won ? 'bg-orange-500/5' : 'bg-red-500/5'}`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-display font-900 ${game.won ? 'bg-orange-500 text-white' : 'bg-red-500/20 text-red-400'}`}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {recentGames.map((game: any) => (
+                  <div key={game.id} style={{
+                    display: 'flex', alignItems: 'center', gap: '0.875rem',
+                    padding: '0.75rem 1rem', borderRadius: '0.625rem',
+                    background: game.won ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)',
+                    border: `1px solid ${game.won ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.1)'}`,
+                  }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '0.375rem',
+                      background: game.won ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '0.85rem',
+                      color: game.won ? '#22c55e' : '#f87171', flexShrink: 0,
+                    }}>
                       {game.won ? 'W' : 'L'}
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-white font-medium">
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.95rem', color: '#fff' }}>
                         {game.score_for} – {game.score_against}
                       </div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(game.played_at).toLocaleDateString()}
+                      <div style={{ fontSize: '0.7rem', color: 'var(--charcoal-400)', marginTop: 1 }}>
+                        {new Date(game.played_at || game.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className={`text-xs font-medium ${game.won ? 'text-orange-400' : 'text-gray-500'}`}>
-                      {game.won ? '+XP' : ''}
-                    </div>
+                    {game.won && (
+                      <span style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+                        +XP
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500 text-sm">
-                No games played yet. <Link href={`/play/simple?career=${career.id}`} className="text-orange-400 hover:text-orange-300">Start playing!</Link>
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div style={{ color: 'var(--charcoal-500)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+                  No games played yet
+                </div>
+                <Link href={`/play/simple?career=${career.id}`} className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
+                  Start Playing
+                </Link>
               </div>
             )}
           </div>
 
           {/* Reputation */}
-          <div className="card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display font-700 text-lg text-white">Reputation</h3>
-              <span className="font-display font-900 text-xl text-white">{career.reputation_score}/100</span>
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div style={{ fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--charcoal-400)', textTransform: 'uppercase' }}>
+                Reputation
+              </div>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.1rem', color: '#fff' }}>
+                {career.reputation_score ?? 0}/100
+              </span>
             </div>
-            <div className="stat-bar h-3 rounded-full">
-              <div
-                className="stat-bar-fill rounded-full"
-                style={{
-                  width: `${career.reputation_score}%`,
-                  background: career.reputation_score >= 75 ? 'linear-gradient(90deg, #25a56e, #48c18a)' :
-                              career.reputation_score >= 50 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' :
-                              'linear-gradient(90deg, #ef4444, #f87171)',
-                }}
-              />
+            <div style={{ height: 8, background: 'var(--navy-700)', borderRadius: 999, overflow: 'hidden', marginBottom: '0.5rem' }}>
+              <div style={{
+                height: '100%',
+                width: `${career.reputation_score ?? 0}%`,
+                background: (career.reputation_score ?? 0) >= 75
+                  ? 'linear-gradient(90deg, #22c55e, #34d399)'
+                  : (career.reputation_score ?? 0) >= 50
+                  ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+                  : 'linear-gradient(90deg, #f97316, #fb923c)',
+                borderRadius: 999,
+                transition: 'width 0.5s ease',
+              }} />
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {career.reputation_score >= 75 ? '🌟 Elite reputation — scouts are watching' :
-               career.reputation_score >= 50 ? '📈 Growing reputation' :
-               '💪 Building your name — keep winning!'}
+            <p style={{ fontSize: '0.75rem', color: 'var(--charcoal-400)' }}>
+              {(career.reputation_score ?? 0) >= 75 ? 'Elite reputation — scouts are watching'
+               : (career.reputation_score ?? 0) >= 50 ? 'Growing reputation — keep building'
+               : 'Building your name — keep winning'}
             </p>
           </div>
         </div>
