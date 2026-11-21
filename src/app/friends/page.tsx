@@ -2,71 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Friends' }
-
-function UsersIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-    </svg>
-  )
-}
-
-function SearchIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.35-4.35"/>
-    </svg>
-  )
-}
-
-function AddPersonIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <line x1="19" y1="8" x2="19" y2="14"/>
-      <line x1="22" y1="11" x2="16" y2="11"/>
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20,6 9,17 4,12"/>
-    </svg>
-  )
-}
-
-function XIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  )
-}
-
-function EmptyFriendsArt() {
-  return (
-    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Two player silhouettes */}
-      <circle cx="28" cy="22" r="10" fill="#374151"/>
-      <path d="M10 56c0-9.94 8.06-18 18-18s18 8.06 18 18" fill="#374151"/>
-      <circle cx="52" cy="22" r="10" fill="#4B5563"/>
-      <path d="M34 56c0-9.94 8.06-18 18-18s18 8.06 18 18" fill="#4B5563"/>
-      {/* Plus connecting them */}
-      <circle cx="40" cy="40" r="10" fill="#1a1a2e" stroke="#374151" strokeWidth="1.5"/>
-      <line x1="40" y1="34" x2="40" y2="46" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"/>
-      <line x1="34" y1="40" x2="46" y2="40" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  )
-}
+export const metadata: Metadata = { title: 'Friends · Draft Day' }
 
 export default async function FriendsPage() {
   const supabase = createClient()
@@ -91,196 +27,168 @@ export default async function FriendsPage() {
   const getFriend = (f: any) => f.requester_id === user.id ? f.addressee : f.requester
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-5xl font-800 text-white">FRIENDS</h1>
-          <p className="text-gray-400 mt-1">Connect with other players</p>
-        </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '12px',
-          padding: '8px 16px',
-          color: '#9CA3AF',
-          fontSize: '14px',
-        }}>
-          <UsersIcon />
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>{accepted.length}</span>
-          <span>friends</span>
+    <div style={{ minHeight: '100vh', background: 'var(--navy-950)' }}>
+
+      {/* HEADER */}
+      <div style={{
+        position: 'relative',
+        background: 'linear-gradient(135deg, #05080f 0%, #0a111e 60%, #0d1020 100%)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        padding: '2.5rem 2rem 2rem',
+        overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'repeating-linear-gradient(90deg, white 0, white 1px, transparent 1px, transparent 60px), repeating-linear-gradient(0deg, white 0, white 1px, transparent 1px, transparent 60px)' }}/>
+        <div style={{ position: 'absolute', top: '-60px', right: '10%', width: '300px', height: '200px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(59,130,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+
+        <div style={{ maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 14px', marginBottom: '14px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '6px' }}>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#3b82f6" strokeWidth="1.5"/><path d="M3 9c0-3 6-3 6 0" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round"/><circle cx="6" cy="4.5" r="1.5" fill="#3b82f6"/></svg>
+                <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', letterSpacing: '0.15em', color: '#3b82f6', textTransform: 'uppercase' }}>SOCIAL HUB</span>
+              </div>
+              <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem,6vw,4.5rem)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.02em', color: 'white' }}>FRIENDS</h1>
+            </div>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <Stat label="FRIENDS" value={String(accepted.length)} color="#3b82f6"/>
+              {incoming.length > 0 && <Stat label="REQUESTS" value={String(incoming.length)} color="#f97316"/>}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Add Friend Card */}
-      <div className="card p-5 mb-6" style={{ borderColor: 'rgba(249,115,22,0.2)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ color: 'var(--accent-orange)' }}><AddPersonIcon /></div>
-          <h2 className="font-display font-700 text-white" style={{ fontSize: '16px', letterSpacing: '0.05em' }}>ADD FRIEND</h2>
-        </div>
-        <form action="/api/friends/send-request" method="POST" style={{ display: 'flex', gap: '10px' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6B7280' }}>
-              <SearchIcon />
-            </span>
-            <input
-              name="username"
-              type="text"
-              placeholder="Search by username…"
-              style={{
-                width: '100%',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                padding: '10px 16px 10px 38px',
-                color: 'white',
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px' }}>
-            Send Request
-          </button>
-        </form>
-      </div>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 2rem 4rem' }}>
 
-      {/* Incoming Requests */}
-      {incoming.length > 0 && (
-        <div className="mb-6">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-            <h2 className="font-display font-700 text-white" style={{ fontSize: '20px' }}>FRIEND REQUESTS</h2>
-            <span style={{
-              background: 'var(--accent-orange)',
-              color: 'white',
-              borderRadius: '999px',
-              padding: '2px 10px',
-              fontSize: '12px',
-              fontFamily: 'var(--font-display)',
-              fontWeight: 700,
-            }}>{incoming.length}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {incoming.map(f => {
-              const friend = getFriend(f)
-              return (
-                <div key={f.id} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  {/* Avatar */}
-                  <div style={{
-                    width: '44px', height: '44px', borderRadius: '12px',
-                    background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '18px', color: 'var(--accent-orange)',
-                  }}>
-                    {friend?.username?.[0]?.toUpperCase() ?? '?'}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ color: 'white', fontWeight: 600, fontSize: '15px' }}>{friend?.display_name ?? friend?.username}</div>
-                    <div style={{ color: '#6B7280', fontSize: '12px' }}>@{friend?.username} · Level {friend?.level ?? 1}</div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <form action="/api/friends/accept" method="POST">
-                      <input type="hidden" name="friendshipId" value={f.id} />
-                      <button type="submit" style={{
-                        background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)',
-                        color: '#10B981', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
-                      }}>
-                        <CheckIcon /> Accept
-                      </button>
-                    </form>
-                    <form action="/api/friends/decline" method="POST">
-                      <input type="hidden" name="friendshipId" value={f.id} />
-                      <button type="submit" style={{
-                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                        color: '#EF4444', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
-                      }}>
-                        <XIcon /> Decline
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              )
-            })}
+        {/* ADD FRIEND */}
+        <div style={{ marginBottom: '28px' }}>
+          <SectionLabel label="ADD A FRIEND" color="#3b82f6"/>
+          <div style={{ padding: '20px 24px', background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: '16px' }}>
+            <form action="/api/friends/send-request" method="POST" style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input name="username" type="text" placeholder="Search by username…" style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 16px 12px 42px', color: 'white', fontFamily: 'Barlow Condensed, sans-serif', fontSize: '15px', outline: 'none' }}/>
+              </div>
+              <button type="submit" style={{ padding: '12px 24px', background: '#3b82f6', border: 'none', borderRadius: '12px', color: 'white', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '14px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '0 4px 16px rgba(59,130,246,0.3)', whiteSpace: 'nowrap' }}>
+                SEND REQUEST
+              </button>
+            </form>
           </div>
         </div>
-      )}
 
-      {/* Friends List */}
-      <div className="mb-6">
-        <h2 className="font-display font-700 text-white mb-3" style={{ fontSize: '20px' }}>YOUR FRIENDS</h2>
-        {accepted.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {accepted.map(f => {
-              const friend = getFriend(f)
-              const initials = friend?.username?.[0]?.toUpperCase() ?? '?'
-              return (
-                <div key={f.id} className="card card-hover" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '44px', height: '44px', borderRadius: '12px',
-                    background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '18px', color: 'var(--accent-orange)',
-                  }}>
-                    {initials}
+        {/* INCOMING REQUESTS */}
+        {incoming.length > 0 && (
+          <div style={{ marginBottom: '28px' }}>
+            <SectionLabel label={`PENDING REQUESTS · ${incoming.length}`} color="#f97316"/>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {incoming.map((f: any) => {
+                const friend = getFriend(f)
+                return (
+                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 18px', background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '14px' }}>
+                    <Avatar name={friend?.username} color="#f97316"/>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '17px', color: 'white', lineHeight: 1 }}>{friend?.display_name ?? friend?.username}</div>
+                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>@{friend?.username} · Level {friend?.level ?? 1}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <form action="/api/friends/accept" method="POST">
+                        <input type="hidden" name="friendshipId" value={f.id}/>
+                        <button type="submit" style={{ padding: '9px 18px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', borderRadius: '10px', color: '#22c55e', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>ACCEPT</button>
+                      </form>
+                      <form action="/api/friends/decline" method="POST">
+                        <input type="hidden" name="friendshipId" value={f.id}/>
+                        <button type="submit" style={{ padding: '9px 18px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', color: '#ef4444', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>DECLINE</button>
+                      </form>
+                    </div>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ color: 'white', fontWeight: 600, fontSize: '15px' }}>{friend?.display_name ?? friend?.username}</div>
-                    <div style={{ color: '#6B7280', fontSize: '12px' }}>@{friend?.username} · Level {friend?.level ?? 1}</div>
-                  </div>
-                  <a href={`/profile/${friend?.username}`} style={{
-                    background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-                    color: '#D1D5DB', borderRadius: '10px', padding: '7px 16px',
-                    fontSize: '13px', fontWeight: 600, textDecoration: 'none',
-                    fontFamily: 'var(--font-display)',
-                  }}>
-                    VIEW
-                  </a>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        ) : (
-          <div className="card" style={{ padding: '48px 24px', textAlign: 'center' }}>
-            <EmptyFriendsArt />
-            <h3 className="font-display font-700 text-white" style={{ fontSize: '20px', margin: '16px 0 8px' }}>NO FRIENDS YET</h3>
-            <p style={{ color: '#6B7280', fontSize: '14px' }}>Search for players by username to send friend requests.</p>
+        )}
+
+        {/* FRIENDS LIST */}
+        <div style={{ marginBottom: '28px' }}>
+          <SectionLabel label="YOUR ROSTER" color="#22c55e"/>
+          {accepted.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {accepted.map((f: any) => {
+                const friend = getFriend(f)
+                return (
+                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px' }}>
+                    <Avatar name={friend?.username} color="#22c55e"/>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '17px', color: 'white', lineHeight: 1 }}>{friend?.display_name ?? friend?.username}</div>
+                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>@{friend?.username} · Level {friend?.level ?? 1}</div>
+                    </div>
+                    <a href={`/profile/${friend?.username}`} style={{ padding: '9px 18px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'rgba(255,255,255,0.7)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                      PROFILE
+                    </a>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div style={{ padding: '56px 24px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px' }}>
+              <svg width="72" height="72" viewBox="0 0 72 72" fill="none" style={{ opacity: 0.3, marginBottom: '16px' }}>
+                <circle cx="24" cy="22" r="10" stroke="white" strokeWidth="1.5"/>
+                <path d="M8 56c0-9 7-16 16-16s16 7 16 16" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="48" cy="22" r="10" stroke="white" strokeWidth="1.5"/>
+                <path d="M32 56c0-9 7-16 16-16s16 7 16 16" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="36" cy="38" r="9" fill="#05080f" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
+                <path d="M36 32v12M30 38h12" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '22px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '8px' }}>NO TEAMMATES YET</div>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '14px', color: 'rgba(255,255,255,0.25)' }}>Search for players above and send a request.</div>
+            </div>
+          )}
+        </div>
+
+        {/* PENDING SENT */}
+        {outgoing.length > 0 && (
+          <div>
+            <SectionLabel label="REQUESTS SENT" color="rgba(255,255,255,0.3)"/>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {outgoing.map((f: any) => {
+                const friend = getFriend(f)
+                return (
+                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 18px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', opacity: 0.55 }}>
+                    <Avatar name={friend?.username} color="rgba(255,255,255,0.3)" size={36}/>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '14px', color: 'rgba(255,255,255,0.4)' }}>@{friend?.username}</div>
+                    <div style={{ marginLeft: 'auto', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)' }}>PENDING</div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
+    </div>
+  )
+}
 
-      {/* Pending Sent */}
-      {outgoing.length > 0 && (
-        <div>
-          <h2 className="font-display font-700 mb-3" style={{ fontSize: '20px', color: '#6B7280' }}>PENDING SENT</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {outgoing.map(f => {
-              const friend = getFriend(f)
-              return (
-                <div key={f.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px', opacity: 0.6 }}>
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.05)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '15px', color: '#6B7280',
-                  }}>
-                    {friend?.username?.[0]?.toUpperCase() ?? '?'}
-                  </div>
-                  <div style={{ flex: 1, fontSize: '14px' }}>
-                    <span style={{ color: '#9CA3AF' }}>@{friend?.username}</span>
-                    <span style={{ color: '#4B5563', marginLeft: '8px' }}>· request pending</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+function Avatar({ name, color, size = 44 }: { name?: string; color: string; size?: number }) {
+  return (
+    <div style={{ width: size, height: size, borderRadius: '12px', background: `${color}18`, border: `1px solid ${color}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: size * 0.4, color, flexShrink: 0 }}>
+      {name?.[0]?.toUpperCase() ?? '?'}
+    </div>
+  )
+}
+
+function Stat({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div style={{ padding: '12px 18px', background: `${color}0d`, border: `1px solid ${color}25`, borderRadius: '12px', textAlign: 'center' }}>
+      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '28px', color, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: `${color}80` }}>{label}</div>
+    </div>
+  )
+}
+
+function SectionLabel({ label, color }: { label: string; color: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+      <div style={{ width: '4px', height: '18px', borderRadius: '2px', background: color }}/>
+      <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>{label}</span>
+      <div style={{ flex: 1, height: '1px', background: `${color}20` }}/>
     </div>
   )
 }

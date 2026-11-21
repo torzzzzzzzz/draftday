@@ -1,8 +1,27 @@
+import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
+function DashCard({ children, accent, topBar }: { children: React.ReactNode; accent: string; topBar?: boolean }) {
+  return (
+    <div style={{ background: '#0a0d14', border: `1px solid ${accent}22`, borderRadius: '14px', padding: '16px', position: 'relative', overflow: 'hidden' }}>
+      {topBar && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: accent, opacity: 0.7 }}/>}
+      {children}
+    </div>
+  )
+}
+
+function CardLabel({ label, color }: { label: string; color: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+      <div style={{ width: '3px', height: '14px', background: color, borderRadius: '2px', flexShrink: 0 }}/>
+      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color }}>{label}</div>
+    </div>
+  )
+}
+
 async function getData(userId: string) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const [profileRes, careerRes, challengesRes, topCareersRes] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).single(),
     supabase.from('careers').select('*, players(*)').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).single(),
@@ -22,7 +41,7 @@ async function getData(userId: string) {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return <LandingPage />
@@ -113,256 +132,180 @@ export default async function HomePage() {
         )}
       </div>
 
-      {/* 3-column dashboard grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+      {/* Row 1: Create Player + Career + Challenges */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', marginBottom: '12px' }}>
 
-        {/* Create Player / Wheel preview */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--orange-400)', marginBottom: '0.2rem' }}>⚡ CREATE YOUR PLAYER</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>SPIN THE WHEEL</div>
-            </div>
-            <Link href="/create-player" style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Try it →</Link>
-          </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.4 }}>
+        {/* Create Player */}
+        <DashCard accent="#f97316" topBar>
+          <CardLabel label="CREATE YOUR PLAYER" color="#f97316"/>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '22px', color: 'white', lineHeight: 1, marginBottom: '8px' }}>SPIN THE WHEEL</div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 500, fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.4, marginBottom: '14px' }}>
             Spin to generate a random football player and build your ultimate athlete!
-          </p>
-          {/* Mini wheel illustration */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
             <MiniWheelSVG />
           </div>
-          <Link href="/create-player" className="btn btn-primary btn-block">
-            🔄 Spin Now
+          <Link href="/create-player" style={{ display: 'block', padding: '10px', background: '#f97316', borderRadius: '10px', color: '#05080f', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '14px', letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', boxShadow: '0 4px 16px rgba(249,115,22,0.3)' }}>
+            SPIN NOW
           </Link>
-        </div>
+        </DashCard>
 
-        {/* Career card */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--navy-200)' }}>📈 YOUR CAREER</div>
-            <Link href="/career" style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>View Career →</Link>
+        {/* Career */}
+        <DashCard accent="#a855f7" topBar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+            <CardLabel label="YOUR CAREER" color="#a855f7"/>
+            <Link href="/career" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: '#a855f7', textDecoration: 'none' }}>VIEW →</Link>
           </div>
-
           {career ? (
             <>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
-                Season {career.season || 1}
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '28px', color: 'white', lineHeight: 1, marginBottom: '4px' }}>
+                {career.players?.name ?? 'No Name'}
               </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                {career.stage || 'College Career'}
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '13px', color: '#a855f7', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '14px' }}>
+                Season {career.season ?? 1} · {(career.stage ?? 'nfl').replace(/_/g, ' ').toUpperCase()}
               </div>
-
-              {/* Season progress bar */}
-              <div style={{ marginBottom: '1rem' }}>
-                <div className="xp-bar" style={{ height: 10 }}>
-                  <div className="xp-fill" style={{ width: `${Math.round(((career.games_played || 0) / 14) * 100)}%` }} />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.3rem', fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-                  <span>{career.games_played || 0} / 14 Games</span>
-                  <span>Season {career.season || 1}</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '14px' }}>
                 {[
-                  { label: 'Overall', value: career.players?.overall || 70 },
-                  { label: 'TDs', value: career.touchdowns || 0 },
-                  { label: 'Yards', value: (career.yards || 0).toLocaleString() },
-                ].map(({ label, value }) => (
-                  <div key={label} style={{ textAlign: 'center', background: 'var(--navy-950)', borderRadius: 'var(--r-md)', padding: '0.5rem' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{value}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+                  { label: 'OVR', value: career.players?.overall ?? 70, color: '#a855f7' },
+                  { label: 'TDs', value: career.touchdowns ?? 0, color: 'white' },
+                  { label: 'WINS', value: career.wins ?? 0, color: 'white' },
+                ].map(({ label, value, color }) => (
+                  <div key={label} style={{ textAlign: 'center', padding: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color, lineHeight: 1 }}>{value}</div>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '10px', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
                   </div>
                 ))}
               </div>
+              <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden', marginBottom: '6px' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, ((career.games_played ?? 0) / 14) * 100)}%`, background: 'linear-gradient(90deg, #a855f7, #c084fc)', borderRadius: '3px' }}/>
+              </div>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
+                {career.games_played ?? 0} / 14 games this season
+              </div>
             </>
           ) : (
-            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>
-                <FootballIconSVG />
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>No active career yet</div>
-              <Link href="/create-player" className="btn btn-primary btn-sm">Start Career</Link>
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '14px', color: 'rgba(255,255,255,0.3)', marginBottom: '14px' }}>No active career yet</div>
+              <Link href="/create-player" style={{ padding: '9px 20px', background: '#a855f7', border: 'none', borderRadius: '10px', color: 'white', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none' }}>START CAREER</Link>
             </div>
           )}
-        </div>
+        </DashCard>
 
         {/* Daily Challenges */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--navy-200)' }}>🎯 DAILY CHALLENGES</div>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', color: 'var(--text-muted)' }}>3h 24m left</span>
+        <DashCard accent="#f97316" topBar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+            <CardLabel label="DAILY CHALLENGES" color="#f97316"/>
+            <Link href="/challenges" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: '#f97316', textDecoration: 'none' }}>ALL →</Link>
           </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            {challenges.length > 0 ? challenges.map((c) => (
-              <div key={c.id} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0.6rem 0.75rem',
-                background: c.completed ? 'rgba(34,197,94,0.06)' : 'var(--navy-950)',
-                borderRadius: 'var(--r-md)',
-                border: `1px solid ${c.completed ? 'rgba(34,197,94,0.15)' : 'var(--border)'}`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 4, background: c.completed ? 'var(--green-500)' : 'var(--navy-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {c.completed ? <span style={{ fontSize: '0.65rem', color: '#fff' }}>✓</span> : null}
-                  </div>
-                  <span style={{ fontSize: '0.8rem', color: c.completed ? 'var(--text-muted)' : 'var(--text-primary)', fontFamily: 'var(--font-display)', fontWeight: 600, textDecoration: c.completed ? 'line-through' : 'none' }}>
-                    {c.title || c.description || 'Complete challenge'}
-                  </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+            {(challenges.length > 0 ? challenges : [
+              { title: 'Complete 3 Games', xp_reward: 250, completed: false },
+              { title: 'Score 2 Touchdowns', xp_reward: 300, completed: false },
+              { title: 'Make 10 Tackles', xp_reward: 250, completed: false },
+            ]).map((c: any, i: number) => (
+              <div key={c.id ?? i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', background: c.completed ? 'rgba(34,197,94,0.07)' : 'rgba(255,255,255,0.03)', border: `1px solid ${c.completed ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.06)'}`, borderRadius: '10px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '5px', background: c.completed ? '#22c55e' : 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {c.completed && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>}
                 </div>
-                <div className="coin-badge" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', gap: '0.25rem' }}>
-                  <CoinSVGSmall /> {c.xp_reward || 250}
+                <div style={{ flex: 1, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '13px', color: c.completed ? 'rgba(255,255,255,0.4)' : 'white', textDecoration: c.completed ? 'line-through' : 'none' }}>
+                  {c.title ?? c.description ?? 'Complete challenge'}
                 </div>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '12px', color: '#f59e0b' }}>+{c.xp_reward ?? 250}</div>
               </div>
-            )) : (
-              [
-                { label: 'Complete 3 Games', reward: 250 },
-                { label: 'Score 2 Touchdowns', reward: 300 },
-                { label: 'Make 10 Tackles', reward: 250 },
-              ].map((c, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '0.6rem 0.75rem',
-                  background: 'var(--navy-950)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 4, background: 'var(--navy-700)', flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-                      {c.label}
-                    </span>
-                  </div>
-                  <div className="coin-badge" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', gap: '0.25rem' }}>
-                    <CoinSVGSmall /> {c.reward}
-                  </div>
-                </div>
-              ))
-            )}
+            ))}
           </div>
-          <Link href="/challenges" className="btn btn-ghost btn-sm btn-block">View All Challenges →</Link>
-        </div>
+          <Link href="/challenges" style={{ display: 'block', padding: '9px', background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '10px', color: '#f97316', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none' }}>
+            VIEW ALL MISSIONS
+          </Link>
+        </DashCard>
       </div>
 
-      {/* Second row: Battle Pass + Shop + Leaderboard */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1.2fr', gap: '1rem' }}>
+      {/* Row 2: Battle Pass + Shop + Leaderboard */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', marginBottom: '12px' }}>
 
         {/* Battle Pass */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)', position: 'relative', overflow: 'hidden' }}>
-          {/* Gold accent border top */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, var(--gold-600), var(--gold-400), var(--orange-500))' }} />
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-400)', marginBottom: '0.2rem' }}>⭐ BATTLE PASS</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.4rem', color: 'var(--text-primary)' }}>Level {profile?.battle_pass_tier || 24}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-                {((profile?.battle_pass_tier || 24) * 312) % 7500} / 7,500 XP
+        <DashCard accent="#f59e0b" topBar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+            <CardLabel label="⭐ BATTLE PASS" color="#f59e0b"/>
+            <Link href="/battle-pass" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: '#f59e0b', textDecoration: 'none' }}>VIEW →</Link>
+          </div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '32px', color: '#f59e0b', lineHeight: 1, marginBottom: '4px' }}>Tier {profile?.battle_pass_tier ?? 1}</div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Season 1 · Gridiron Glory</div>
+          <div style={{ height: '8px', background: 'rgba(255,255,255,0.07)', borderRadius: '4px', overflow: 'hidden', marginBottom: '6px' }}>
+            <div style={{ height: '100%', width: `${(((profile?.battle_pass_tier ?? 1) * 312) % 1000) / 10}%`, background: 'linear-gradient(90deg, #d97706, #f59e0b)', borderRadius: '4px', boxShadow: '0 0 8px rgba(245,158,11,0.4)' }}/>
+          </div>
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '14px' }}>
+            {((profile?.battle_pass_tier ?? 1) * 312) % 1000} / 1,000 XP to next tier
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {[{ label: 'DD Helmet', tier: profile?.battle_pass_tier ?? 1, cur: true }, { label: 'Player Skin', tier: (profile?.battle_pass_tier ?? 1) + 1 }, { label: '2× XP', tier: (profile?.battle_pass_tier ?? 1) + 2, gold: true }].map((r) => (
+              <div key={r.tier} style={{ flex: 1, textAlign: 'center', padding: '8px 4px', background: r.cur ? 'rgba(249,115,22,0.1)' : r.gold ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.03)', border: `1px solid ${r.cur ? 'rgba(249,115,22,0.3)' : r.gold ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.06)'}`, borderRadius: '8px' }}>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '10px', color: r.cur ? '#f97316' : r.gold ? '#f59e0b' : 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>T{r.tier}</div>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '11px', color: r.cur ? 'white' : 'rgba(255,255,255,0.5)' }}>{r.label}</div>
               </div>
-            </div>
-            <Link href="/battle-pass" style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>View Battle Pass →</Link>
+            ))}
           </div>
+        </DashCard>
 
-          {/* XP bar */}
-          <div className="xp-bar" style={{ height: 10, marginBottom: '1rem' }}>
-            <div className="xp-fill" style={{ background: 'linear-gradient(90deg, var(--gold-600), var(--gold-400))', width: `${(((profile?.battle_pass_tier || 24) * 312) % 7500) / 75}%` }} />
+        {/* Shop */}
+        <DashCard accent="#a855f7" topBar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+            <CardLabel label="THE SHOP" color="#a855f7"/>
+            <Link href="/shop" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: '#a855f7', textDecoration: 'none' }}>VISIT →</Link>
           </div>
-
-          {/* Reward previews */}
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
             {[
-              { tier: (profile?.battle_pass_tier || 24), label: 'DD Helmet', current: true },
-              { tier: (profile?.battle_pass_tier || 24) + 1, label: 'Player Skin' },
-              { tier: (profile?.battle_pass_tier || 24) + 2, label: '2× XP', gold: true },
-            ].map(({ tier, label, current, gold }) => (
-              <div key={tier} style={{
-                flex: 1, textAlign: 'center',
-                background: current ? 'rgba(249,115,22,0.1)' : gold ? 'rgba(245,158,11,0.1)' : 'var(--navy-950)',
-                border: `1px solid ${current ? 'rgba(249,115,22,0.3)' : gold ? 'rgba(245,158,11,0.25)' : 'var(--border)'}`,
-                borderRadius: 'var(--r-md)', padding: '0.75rem 0.5rem',
-              }}>
-                <div style={{ marginBottom: '0.4rem' }}>
-                  {gold ? <BattlePassGoldRewardSVG /> : <BattlePassRewardSVG current={!!current} />}
-                </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', color: current ? 'var(--orange-400)' : gold ? 'var(--gold-400)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Tier {tier}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{label}</div>
+              { name: 'Elite Gold Helmet', price: 2400, rarity: 'legendary', color: '#f59e0b' },
+              { name: 'Carbon Visor',      price: 800,  rarity: 'rare',      color: '#3b82f6' },
+              { name: 'Victory Emote',     price: 1200, rarity: 'epic',      color: '#a855f7' },
+            ].map((item) => (
+              <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${item.color}20`, borderRadius: '10px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, flexShrink: 0 }}/>
+                <div style={{ flex: 1, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', color: 'white' }}>{item.name}</div>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', color: '#f59e0b' }}>{item.price.toLocaleString()}</div>
               </div>
             ))}
           </div>
-        </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', marginBottom: '10px' }}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" strokeWidth="1"/><text x="10" y="14" textAnchor="middle" fontFamily="Barlow Condensed,sans-serif" fontWeight="900" fontSize="10" fill="#f59e0b">$</text></svg>
+            <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color: '#f59e0b', lineHeight: 1 }}>{(profile?.coins ?? 0).toLocaleString()}</span>
+            <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: 'rgba(245,158,11,0.6)', textTransform: 'uppercase' }}>coins</span>
+          </div>
+          <Link href="/shop" style={{ display: 'block', padding: '9px', background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', borderRadius: '10px', color: '#a855f7', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none' }}>
+            OPEN SHOP
+          </Link>
+        </DashCard>
 
-        {/* Shop preview */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--navy-200)' }}>🛒 THE SHOP</div>
-            <Link href="/shop" style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Visit Shop →</Link>
+        {/* Leaderboard */}
+        <DashCard accent="#f59e0b" topBar>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+            <CardLabel label="👑 TOP PLAYERS" color="#f59e0b"/>
+            <Link href="/leaderboards" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '11px', color: '#f59e0b', textDecoration: 'none' }}>BOARD →</Link>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {[
-              { name: 'DD Helmet', price: 1200, rarity: 'rarity-epic' },
-              { name: 'Jersey #7', price: 800, rarity: 'rarity-rare' },
-              { name: 'Gloves', price: 600, rarity: 'rarity-common' },
-            ].map((item, i) => (
-              <div key={i} className="shop-item" style={{ padding: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <div className={`shop-item-rarity ${item.rarity}`} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2 }} />
-                <ShopItemSVG rarity={item.rarity} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{item.name}</div>
-                </div>
-                <div className="coin-badge" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>
-                  <CoinSVGSmall /> {item.price.toLocaleString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Career of the Week / Leaderboard */}
-        <div className="card" style={{ padding: '1.25rem', background: 'var(--navy-900)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-400)' }}>👑 CAREER OF THE WEEK</div>
-            <Link href="/leaderboards" style={{ fontSize: '0.7rem', color: 'var(--orange-400)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Full Board →</Link>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            {topCareers.slice(0, 3).map((c, i) => (
-              <div key={c.id} className="lb-row" style={{ padding: '0.5rem 0.6rem' }}>
-                <div className={`lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze'}`}>{i + 1}</div>
-                <div className="avatar avatar-sm" style={{ background: i === 0 ? 'rgba(245,158,11,0.2)' : 'var(--navy-700)', color: i === 0 ? 'var(--gold-400)' : 'var(--text-secondary)', border: i === 0 ? '1.5px solid rgba(245,158,11,0.3)' : '1.5px solid var(--border)' }}>
-                  {(c.profiles?.display_name || c.profiles?.username || '?').slice(0, 2).toUpperCase()}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.2 }}>
-                    {c.players?.name || 'Unknown Player'}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+            {topCareers.length > 0 ? topCareers.slice(0, 3).map((c: any, i: number) => {
+              const rankColors = ['#f59e0b', '#94a3b8', '#cd7c46']
+              return (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', background: i === 0 ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.02)', border: `1px solid ${i === 0 ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '10px' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: `${rankColors[i]}20`, border: `1px solid ${rankColors[i]}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '13px', color: rankColors[i], flexShrink: 0 }}>{i+1}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', color: 'white', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.players?.name ?? 'Unknown'}</div>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '1px' }}>@{c.profiles?.username ?? '—'}</div>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                    by @{c.profiles?.username || '—'}
-                  </div>
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color: i === 0 ? '#f59e0b' : 'rgba(255,255,255,0.6)', lineHeight: 1 }}>{c.players?.overall ?? c.level * 3 + 60}</div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem', color: i === 0 ? 'var(--gold-400)' : 'var(--text-secondary)' }}>
-                  {c.players?.overall || c.level * 3 + 60}
-                </div>
-              </div>
-            ))}
-            {topCareers.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No rankings yet — be first!
-              </div>
+              )
+            }) : (
+              <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '13px', color: 'rgba(255,255,255,0.25)' }}>No rankings yet — be first!</div>
             )}
           </div>
-        </div>
+          <Link href="/leaderboards" style={{ display: 'block', padding: '9px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', color: '#f59e0b', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none' }}>
+            FULL LEADERBOARD
+          </Link>
+        </DashCard>
       </div>
 
-      {/* Mobile padding */}
-      <div style={{ height: '1rem' }} />
-
-      <style>{`
-        @media (max-width: 1024px) {
-          .dash-grid-top { grid-template-columns: 1fr 1fr !important; }
-          .dash-grid-bot { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 700px) {
-          .dash-grid-top, .dash-grid-bot { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      <div style={{ height: '2rem' }}/>
     </div>
   )
 }
