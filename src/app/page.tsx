@@ -470,10 +470,7 @@ function LandingPage() {
             { icon: '⚡', name: 'Challenge Mode', desc: 'Beat special constraints and earn rewards', accent: 'var(--gold-500)' },
             { icon: '🔧', name: 'Sandbox', desc: 'Experiment freely, no rules, pure creativity', accent: 'var(--red-500)' },
           ].map(({ icon, name, desc, accent }) => (
-            <div key={name} className="card" style={{ padding: '1.25rem', borderTop: `3px solid ${accent}`, transition: 'transform 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-              onMouseLeave={e => e.currentTarget.style.transform = ''}
-            >
+            <div key={name} className="card card-hover" style={{ padding: '1.25rem', borderTop: `3px solid ${accent}` }}>
               <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>{icon}</div>
               <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem', color: 'var(--text-primary)' }}>{name}</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>{desc}</div>

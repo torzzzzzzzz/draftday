@@ -174,14 +174,10 @@ export default async function PlayPage() {
         {GAME_MODES.slice(1).map(mode => {
           const Icon = mode.icon
           return (
-            <div key={mode.id} className="card" style={{
+            <div key={mode.id} className="card card-hover" style={{
               padding: '1.5rem', borderTop: `3px solid ${mode.accent}`,
-              background: 'var(--navy-900)', transition: 'transform 0.2s, box-shadow 0.2s',
-              cursor: 'pointer',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.4)`; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-            >
+              background: 'var(--navy-900)', cursor: 'pointer',
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 'var(--r-md)', background: `${mode.accent}1a`, border: `1px solid ${mode.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon color={mode.accent} size={20} />

@@ -168,6 +168,13 @@ input, textarea, select { font-family: inherit; }
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
 }
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
 
 /* ── SECTION HEADERS ── */
 .section-label {

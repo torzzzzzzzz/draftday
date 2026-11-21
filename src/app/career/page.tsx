@@ -144,13 +144,10 @@ export default async function CareerPage({ searchParams }: { searchParams: { new
 
               return (
                 <Link key={career.id} href={`/career/${career.id}`} style={{ textDecoration: 'none' }}>
-                  <div className="card" style={{
+                  <div className="card card-hover" style={{
                     padding: '1.25rem',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)' }}>
+                  }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                       {/* Player card thumb */}
                       <PlayerCardSVG
