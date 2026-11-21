@@ -4,71 +4,6 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Leaderboards · Draft Day' }
 
-function TrophyIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M10 13c-3.5 0-6-2.5-6-6V3h12v4c0 3.5-2.5 6-6 6z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-      <path d="M4 5H2a1 1 0 000 2c0 1.5 1 2.5 2 3M16 5h2a1 1 0 010 2c0 1.5-1 2.5-2 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M10 13v3M7 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  )
-}
-
-function StarIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-    </svg>
-  )
-}
-
-function FireIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M10 2c0 0 5 4 5 9a5 5 0 01-10 0c0-2 1-3.5 2-4.5 0 1.5 1 2.5 2 3 0-3 1-5.5 1-7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-    </svg>
-  )
-}
-
-function RankBadge({ rank }: { rank: number }) {
-  if (rank === 1) return (
-    <div style={{
-      width: 32, height: 32, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '0.85rem', color: '#fff',
-      flexShrink: 0, boxShadow: '0 0 12px rgba(245,158,11,0.5)',
-    }}>1</div>
-  )
-  if (rank === 2) return (
-    <div style={{
-      width: 32, height: 32, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #94a3b8, #64748b)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '0.85rem', color: '#fff',
-      flexShrink: 0,
-    }}>2</div>
-  )
-  if (rank === 3) return (
-    <div style={{
-      width: 32, height: 32, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #cd7c3f, #a0522d)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '0.85rem', color: '#fff',
-      flexShrink: 0,
-    }}>3</div>
-  )
-  return (
-    <div style={{
-      width: 32, height: 32, borderRadius: '50%',
-      background: 'var(--navy-700)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem', color: 'var(--charcoal-200)',
-      flexShrink: 0,
-    }}>{rank}</div>
-  )
-}
-
 export default async function LeaderboardsPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -80,7 +15,6 @@ export default async function LeaderboardsPage() {
     .limit(10)
   const hofEntries = hofEntriesRaw as any[] | null
 
-  // Top OVR careers
   const { data: topCareersRaw } = await supabase
     .from('careers')
     .select(`*, players(name, position, overall)`)
@@ -89,180 +23,349 @@ export default async function LeaderboardsPage() {
     .limit(10)
   const topCareers = topCareersRaw as any[] | null
 
-  const statCards = [
-    { label: 'Hall of Famers', value: hofEntries?.length ?? 0, icon: <StarIcon />, color: 'var(--gold-500)', glow: 'rgba(245,158,11,0.15)' },
-    { label: 'Active Careers', value: topCareers?.length ?? 0, icon: <FireIcon />, color: 'var(--orange-500)', glow: 'rgba(249,115,22,0.15)' },
-    { label: 'Super Bowls Won', value: topCareers?.reduce((s: number, c: any) => s + (c.super_bowl_wins || 0), 0) ?? 0, icon: <TrophyIcon />, color: 'var(--green-500)', glow: 'rgba(34,197,94,0.15)' },
-  ]
+  const totalSBs = topCareers?.reduce((s: number, c: any) => s + (c.super_bowl_wins || 0), 0) ?? 0
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ fontSize: '0.75rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.15em', color: 'var(--orange-400)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          SEASON 1
+    <div style={{ minHeight: '100vh', background: 'var(--navy-950)' }}>
+
+      {/* SCOREBOARD HERO */}
+      <div style={{
+        position: 'relative',
+        background: 'linear-gradient(180deg, #0a1628 0%, #05080f 100%)',
+        borderBottom: '1px solid rgba(249,115,22,0.2)',
+        overflow: 'hidden',
+        padding: '3rem 2rem 2.5rem',
+      }}>
+        {/* Background grid lines */}
+        <div style={{
+          position: 'absolute', inset: 0, opacity: 0.03,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}/>
+        {/* Orange glow */}
+        <div style={{
+          position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)',
+          width: '600px', height: '200px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(249,115,22,0.15) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}/>
+
+        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          {/* Season badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 16px', marginBottom: '20px',
+            background: 'rgba(249,115,22,0.1)',
+            border: '1px solid rgba(249,115,22,0.3)',
+            borderRadius: '99px',
+          }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f97316', animation: 'pulse 2s infinite' }}/>
+            <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '12px', letterSpacing: '0.15em', color: '#f97316', textTransform: 'uppercase' }}>
+              SEASON 1 · LIVE
+            </span>
+          </div>
+
+          <h1 style={{
+            fontFamily: 'Barlow Condensed, sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+            lineHeight: 0.9,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            color: 'white',
+            marginBottom: '24px',
+          }}>
+            DRAFT DAY<br/><span style={{ color: '#f97316' }}>RANKINGS</span>
+          </h1>
+
+          {/* Stat ticker */}
+          <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
+            {[
+              { label: 'Hall of Famers', value: hofEntries?.length ?? 0, color: '#f59e0b' },
+              { label: 'Active Careers', value: topCareers?.length ?? 0, color: '#f97316' },
+              { label: 'Super Bowls Won', value: totalSBs, color: '#22c55e' },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '40px', color, lineHeight: 1 }}>
+                  {value}
+                </span>
+                <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(2.5rem,6vw,4rem)', color: '#fff', letterSpacing: '-0.02em', lineHeight: 1 }}>
-          LEADERBOARDS
-        </h1>
-        <p style={{ color: 'var(--charcoal-300)', marginTop: '0.5rem' }}>
-          The best careers in Draft Day history
-        </p>
       </div>
 
-      {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-        {statCards.map((stat, i) => (
-          <div key={i} className="card" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      {/* MAIN CONTENT */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 2rem 4rem' }}>
+
+        {/* TOP BOARD — full width rankings table */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <SectionHeader label="TOP ACTIVE CAREERS" color="#f97316"/>
+
+          <div style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+          }}>
+            {/* Table head */}
             <div style={{
-              width: 44, height: 44, borderRadius: '0.75rem',
-              background: stat.glow,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: stat.color, flexShrink: 0,
+              display: 'grid',
+              gridTemplateColumns: '60px 1fr 100px 100px 100px 80px',
+              padding: '12px 20px',
+              background: 'rgba(255,255,255,0.03)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 700,
+              fontSize: '11px',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.35)',
             }}>
-              {stat.icon}
-            </div>
-            <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.75rem', color: '#fff', lineHeight: 1 }}>
-                {stat.value}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--charcoal-400)', marginTop: 2 }}>
-                {stat.label}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        {/* Career of the Week */}
-        <div>
-          <div style={{ fontSize: '0.7rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--orange-400)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-            Career of the Week
-          </div>
-          <CareerOfTheWeek />
-        </div>
-
-        {/* Hall of Fame */}
-        <div>
-          <div style={{ fontSize: '0.7rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--gold-500)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-            Hall of Fame
-          </div>
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <div style={{ color: 'var(--gold-500)' }}><StarIcon /></div>
-              <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.1rem', color: '#fff' }}>
-                  Hall of Fame
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--charcoal-400)' }}>
-                  Legendary careers — 3+ Super Bowls
-                </div>
-              </div>
+              <span>RANK</span>
+              <span>PLAYER</span>
+              <span style={{ textAlign: 'center' }}>OVR</span>
+              <span style={{ textAlign: 'center' }}>SUPER BOWLS</span>
+              <span style={{ textAlign: 'center' }}>SEASON</span>
+              <span style={{ textAlign: 'right' }}>STAGE</span>
             </div>
 
-            {hofEntries && hofEntries.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {hofEntries.map((entry: any, i: number) => (
-                  <div key={entry.id} className="lb-row" style={{
-                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                    padding: '0.75rem 1rem', borderRadius: '0.5rem',
-                    background: i === 0 ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.03)',
-                    border: i === 0 ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
+            {topCareers && topCareers.length > 0 ? topCareers.map((career: any, i: number) => {
+              const player = career.players as any
+              const isTop3 = i < 3
+              const rankColors = ['#f59e0b', '#94a3b8', '#cd7c3f']
+              const rankColor = isTop3 ? rankColors[i] : 'rgba(255,255,255,0.3)'
+              return (
+                <div key={career.id} style={{
+                  display: 'grid',
+                  gridTemplateColumns: '60px 1fr 100px 100px 100px 80px',
+                  padding: '14px 20px',
+                  alignItems: 'center',
+                  borderBottom: i < topCareers.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                  background: i === 0 ? 'rgba(245,158,11,0.04)' : 'transparent',
+                  transition: 'background 0.15s',
+                }}>
+                  {/* Rank */}
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: isTop3 ? `${rankColor}18` : 'transparent',
+                    border: isTop3 ? `1.5px solid ${rankColor}44` : '1.5px solid rgba(255,255,255,0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'Barlow Condensed, sans-serif',
+                    fontWeight: 900,
+                    fontSize: isTop3 ? '18px' : '14px',
+                    color: rankColor,
                   }}>
-                    <RankBadge rank={i + 1} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.95rem', color: '#fff' }}>
-                        {entry.player_name}
-                      </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--charcoal-400)', marginTop: 2 }}>
-                        {entry.position} · @{(entry.profiles as any)?.username}
-                      </div>
+                    {i + 1}
+                  </div>
+
+                  {/* Player */}
+                  <div>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '17px', color: 'white', lineHeight: 1.1 }}>
+                      {player?.name ?? 'Unknown Player'}
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.25rem', color: 'var(--gold-500)' }}>
-                        {entry.overall_rating}
-                      </div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--gold-400)', marginTop: 1 }}>
-                        SB ×{entry.super_bowl_wins}
-                      </div>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', marginTop: '2px' }}>
+                      {player?.position} · {career.nfl_team || 'Free Agent'}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ margin: '0 auto 1rem' }}>
-                  <circle cx="24" cy="24" r="22" stroke="var(--navy-600)" strokeWidth="2"/>
-                  <path d="M24 10l3 7h7l-5.5 4 2 7L24 24l-6.5 4 2-7L14 17h7l3-7z" stroke="var(--charcoal-500)" strokeWidth="1.5" fill="none"/>
+
+                  {/* OVR */}
+                  <div style={{
+                    textAlign: 'center',
+                    fontFamily: 'Barlow Condensed, sans-serif',
+                    fontWeight: 900,
+                    fontSize: '24px',
+                    color: (player?.overall ?? 70) >= 90 ? '#22c55e' : (player?.overall ?? 70) >= 80 ? '#3b82f6' : '#f97316',
+                  }}>
+                    {player?.overall ?? '--'}
+                  </div>
+
+                  {/* Super Bowls */}
+                  <div style={{ textAlign: 'center' }}>
+                    {career.super_bowl_wins > 0 ? (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '4px 10px',
+                        background: 'rgba(245,158,11,0.15)',
+                        border: '1px solid rgba(245,158,11,0.3)',
+                        borderRadius: '8px',
+                        fontFamily: 'Barlow Condensed, sans-serif',
+                        fontWeight: 800,
+                        fontSize: '14px',
+                        color: '#f59e0b',
+                      }}>
+                        🏆 {career.super_bowl_wins}
+                      </span>
+                    ) : (
+                      <span style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '14px' }}>—</span>
+                    )}
+                  </div>
+
+                  {/* Season */}
+                  <div style={{ textAlign: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '16px', color: 'rgba(255,255,255,0.6)' }}>
+                    {career.season ?? 1}
+                  </div>
+
+                  {/* Stage */}
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontFamily: 'Barlow Condensed, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '11px',
+                      letterSpacing: '0.08em',
+                      background: career.stage === 'nfl' ? 'rgba(34,197,94,0.15)' : career.stage === 'college' ? 'rgba(59,130,246,0.15)' : 'rgba(249,115,22,0.15)',
+                      color: career.stage === 'nfl' ? '#22c55e' : career.stage === 'college' ? '#60a5fa' : '#f97316',
+                      border: `1px solid ${career.stage === 'nfl' ? 'rgba(34,197,94,0.3)' : career.stage === 'college' ? 'rgba(59,130,246,0.3)' : 'rgba(249,115,22,0.3)'}`,
+                    }}>
+                      {career.stage?.toUpperCase() ?? 'HS'}
+                    </span>
+                  </div>
+                </div>
+              )
+            }) : (
+              <div style={{ padding: '4rem', textAlign: 'center' }}>
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={{ margin: '0 auto 16px' }}>
+                  <circle cx="32" cy="32" r="30" stroke="rgba(255,255,255,0.08)" strokeWidth="2"/>
+                  <path d="M32 14l3.5 10 10.5 1-7.5 7.5 2.5 10.5L32 38l-9 5.5 2.5-10.5L18.5 25l10.5-1L32 14z" stroke="rgba(249,115,22,0.3)" strokeWidth="1.5" fill="none"/>
                 </svg>
-                <p style={{ color: 'var(--charcoal-500)', fontSize: '0.9rem' }}>No Hall of Famers yet</p>
-                <p style={{ color: 'var(--charcoal-600)', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                  Win 3+ Super Bowls to be inducted
+                <p style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '18px', color: 'rgba(255,255,255,0.3)' }}>
+                  No careers ranked yet. Be first on the board.
                 </p>
               </div>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Top Active Careers */}
-      <div style={{ marginTop: '2rem' }}>
-        <div style={{ fontSize: '0.7rem', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--orange-400)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-          Top Active Careers
-        </div>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          {/* Table header */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: '48px 1fr 80px 80px 80px',
-            padding: '0 0.5rem 0.75rem', borderBottom: '1px solid var(--border)',
-            fontSize: '0.65rem', fontFamily: 'var(--font-display)', fontWeight: 700,
-            letterSpacing: '0.1em', color: 'var(--charcoal-500)', textTransform: 'uppercase',
-          }}>
-            <span>#</span>
-            <span>Player / Position</span>
-            <span style={{ textAlign: 'center' }}>OVR</span>
-            <span style={{ textAlign: 'center' }}>SBs</span>
-            <span style={{ textAlign: 'center' }}>Season</span>
+        {/* BOTTOM: Career of Week + Hall of Fame side by side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+
+          {/* Career of the Week */}
+          <div>
+            <SectionHeader label="CAREER OF THE WEEK" color="#f97316"/>
+            <CareerOfTheWeek />
           </div>
-          {topCareers && topCareers.length > 0 ? (
-            topCareers.map((career: any, i: number) => {
-              const player = career.players as any
-              return (
-                <div key={career.id} style={{
-                  display: 'grid', gridTemplateColumns: '48px 1fr 80px 80px 80px',
-                  padding: '0.75rem 0.5rem', alignItems: 'center',
-                  borderBottom: i < topCareers.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                }}>
-                  <RankBadge rank={i + 1} />
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem', color: '#fff' }}>
-                      {player?.name ?? 'Unknown'}
-                    </div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--charcoal-400)', marginTop: 1 }}>
-                      {player?.position}
-                    </div>
+
+          {/* Hall of Fame */}
+          <div>
+            <SectionHeader label="HALL OF FAME" color="#f59e0b"/>
+            <div style={{
+              background: 'rgba(245,158,11,0.03)',
+              border: '1px solid rgba(245,158,11,0.15)',
+              borderRadius: '16px',
+              overflow: 'hidden',
+            }}>
+              {/* HOF header */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid rgba(245,158,11,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" fill="rgba(245,158,11,0.3)" stroke="#f59e0b" strokeWidth="1.2" strokeLinejoin="round"/>
+                </svg>
+                <div>
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '15px', color: 'white' }}>
+                    Hall of Fame
                   </div>
-                  <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.1rem', color: 'var(--orange-400)' }}>
-                    {player?.overall ?? '--'}
-                  </div>
-                  <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--gold-400)' }}>
-                    {career.super_bowl_wins ?? 0}
-                  </div>
-                  <div style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--charcoal-300)' }}>
-                    {career.season ?? 1}
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>
+                    3+ SUPER BOWLS · ALL-TIME GREATS
                   </div>
                 </div>
-              )
-            })
-          ) : (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--charcoal-500)' }}>
-              No active careers yet. Be the first!
+              </div>
+
+              {hofEntries && hofEntries.length > 0 ? (
+                <div>
+                  {hofEntries.map((entry: any, i: number) => (
+                    <div key={entry.id} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 20px',
+                      borderBottom: i < hofEntries.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      background: i === 0 ? 'rgba(245,158,11,0.06)' : 'transparent',
+                    }}>
+                      <div style={{
+                        width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
+                        background: i === 0 ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)',
+                        border: i === 0 ? '1.5px solid rgba(245,158,11,0.4)' : '1.5px solid rgba(255,255,255,0.08)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '14px',
+                        color: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#cd7c3f' : 'rgba(255,255,255,0.3)',
+                      }}>
+                        {i + 1}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '15px', color: 'white', lineHeight: 1 }}>
+                          {entry.player_name}
+                        </div>
+                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>
+                          {entry.position} · @{(entry.profiles as any)?.username ?? '—'}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color: '#f59e0b', lineHeight: 1 }}>
+                          {entry.overall_rating}
+                        </div>
+                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '10px', color: 'rgba(245,158,11,0.6)', letterSpacing: '0.06em', marginTop: '2px' }}>
+                          🏆 ×{entry.super_bowl_wins}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ margin: '0 auto 12px' }}>
+                    <circle cx="24" cy="24" r="22" stroke="rgba(245,158,11,0.2)" strokeWidth="1.5"/>
+                    <path d="M24 10l3 7h7l-5.5 4 2 7L24 24l-6.5 4 2-7L14 17h7l3-7z" stroke="rgba(245,158,11,0.3)" strokeWidth="1.5" fill="none"/>
+                  </svg>
+                  <p style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '15px', color: 'rgba(255,255,255,0.3)', marginBottom: '4px' }}>
+                    No inductees yet
+                  </p>
+                  <p style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600, fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>
+                    Win 3+ Super Bowls to earn immortality
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function SectionHeader({ label, color }: { label: string; color: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px',
+    }}>
+      <div style={{ width: '4px', height: '20px', borderRadius: '2px', background: color, flexShrink: 0 }}/>
+      <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }}/>
     </div>
   )
 }
