@@ -123,7 +123,7 @@ export default function GamePage({ params }: { params: { mode: string } }) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-400">Loading your game…</p>
         </div>
       </div>
@@ -205,9 +205,9 @@ export default function GamePage({ params }: { params: { mode: string } }) {
       {phase === 'result' && result && (
         <div className="space-y-4">
           {/* Scoreboard */}
-          <div className={`card p-6 text-center ${result.won ? 'border-brand-500/30' : 'border-red-500/20'}`}>
+          <div className={`card p-6 text-center ${result.won ? 'border-orange-500/30' : 'border-red-500/20'}`}>
             <div className="text-5xl mb-2">{result.won ? '🏆' : '💪'}</div>
-            <div className={`font-display text-4xl font-900 mb-1 ${result.won ? 'text-brand-400' : 'text-red-400'}`}>
+            <div className={`font-display text-4xl font-900 mb-1 ${result.won ? 'text-orange-400' : 'text-red-400'}`}>
               {result.won ? 'VICTORY!' : 'LOSS'}
             </div>
             <div className="font-display text-6xl font-900 text-white my-4">
@@ -232,8 +232,8 @@ export default function GamePage({ params }: { params: { mode: string } }) {
           <div className="card p-5">
             <h3 className="font-display font-700 text-lg text-white mb-3">Rewards Earned</h3>
             <div className="flex gap-4">
-              <div className="flex-1 bg-brand-500/10 rounded-xl p-3 text-center">
-                <div className="text-2xl font-display font-900 text-brand-400">+{result.xpEarned}</div>
+              <div className="flex-1 bg-orange-500/10 rounded-xl p-3 text-center">
+                <div className="text-2xl font-display font-900 text-orange-400">+{result.xpEarned}</div>
                 <div className="text-xs text-gray-500">XP</div>
               </div>
               <div className="flex-1 bg-amber-500/10 rounded-xl p-3 text-center">

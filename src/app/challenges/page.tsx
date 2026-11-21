@@ -29,10 +29,10 @@ export default async function ChallengesPage() {
       <div className={`card p-4 ${isComplete ? 'opacity-60' : ''}`}>
         <div className="flex items-start gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-            isComplete ? 'bg-brand-500/20' : 'bg-white/5'
+            isComplete ? 'bg-orange-500/20' : 'bg-white/5'
           }`}>
             {isComplete
-              ? <CheckCircle size={18} className="text-brand-400" />
+              ? <CheckCircle size={18} className="text-orange-400" />
               : <Zap size={18} className="text-amber-400" />
             }
           </div>
@@ -45,7 +45,7 @@ export default async function ChallengesPage() {
                 {challenge.xp_reward > 0 && (
                   <>
                     <span className="text-gray-600 mx-1">·</span>
-                    <span className="text-brand-400 text-sm font-display font-700">{challenge.xp_reward}</span>
+                    <span className="text-orange-400 text-sm font-display font-700">{challenge.xp_reward}</span>
                     <span className="text-xs text-gray-500">XP</span>
                   </>
                 )}
@@ -73,7 +73,7 @@ export default async function ChallengesPage() {
             )}
 
             {isComplete && (
-              <div className="mt-2 text-xs text-brand-400">✓ Completed!</div>
+              <div className="mt-2 text-xs text-orange-400">✓ Completed!</div>
             )}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default async function ChallengesPage() {
           <div className="text-xs text-gray-500 mt-0.5">Daily Done</div>
         </div>
         <div className="card p-4 text-center">
-          <div className="text-2xl font-display font-900 text-brand-400">
+          <div className="text-2xl font-display font-900 text-orange-400">
             {weekly.filter(c => c.challenge_progress?.[0]?.completed_at).length}/{weekly.length}
           </div>
           <div className="text-xs text-gray-500 mt-0.5">Weekly Done</div>
@@ -132,7 +132,7 @@ export default async function ChallengesPage() {
       {/* Weekly */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Calendar size={16} className="text-brand-400" />
+          <Calendar size={16} className="text-orange-400" />
           <h2 className="font-display font-700 text-xl text-white">Weekly Challenges</h2>
           <span className="text-xs text-gray-500 ml-auto">Resets Monday</span>
         </div>

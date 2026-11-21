@@ -66,7 +66,7 @@ export default async function ShopPage() {
       {/* Daily shop */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <RefreshCw size={16} className="text-brand-400" />
+          <RefreshCw size={16} className="text-orange-400" />
           <h2 className="font-display font-700 text-xl text-white">Daily Deals</h2>
           <span className="text-xs text-gray-500 ml-2">8 items · refreshes daily</span>
         </div>
@@ -141,9 +141,9 @@ export default async function ShopPage() {
       </div>
 
       {/* How to earn coins */}
-      <div className="card p-5 bg-brand-500/5 border-brand-500/20">
+      <div className="card p-5 bg-orange-500/5 border-orange-500/20">
         <div className="flex items-start gap-3">
-          <Info size={18} className="text-brand-400 mt-0.5 shrink-0" />
+          <Info size={18} className="text-orange-400 mt-0.5 shrink-0" />
           <div>
             <h3 className="font-medium text-white mb-1">How to Earn Coins</h3>
             <ul className="text-sm text-gray-400 space-y-0.5">

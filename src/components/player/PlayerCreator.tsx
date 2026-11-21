@@ -224,7 +224,7 @@ export function PlayerCreator({ userId }: PlayerCreatorProps) {
               onClick={() => i <= stepIdx && setStep(s)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                 s === step
-                  ? 'bg-brand-500/20 text-brand-400'
+                  ? 'bg-orange-500/20 text-orange-400'
                   : i < stepIdx
                     ? 'text-gray-300 hover:bg-white/5 cursor-pointer'
                     : 'text-gray-600 cursor-not-allowed'
@@ -232,9 +232,9 @@ export function PlayerCreator({ userId }: PlayerCreatorProps) {
             >
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border ${
                 s === step
-                  ? 'bg-brand-500 border-brand-500 text-white'
+                  ? 'bg-orange-500 border-orange-500 text-white'
                   : i < stepIdx
-                    ? 'bg-brand-500/20 border-brand-500/50 text-brand-400'
+                    ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
                     : 'border-white/10 text-gray-600'
               }`}>
                 {i < stepIdx ? <Check size={10} /> : i + 1}

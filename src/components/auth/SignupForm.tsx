@@ -80,8 +80,8 @@ export function SignupForm() {
   if (success) {
     return (
       <div className="text-center py-8">
-        <div className="w-16 h-16 rounded-full bg-brand-500/20 flex items-center justify-center mx-auto mb-4">
-          <Check size={28} className="text-brand-400" />
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{background:'rgba(249,115,22,0.15)'}}>
+          <Check size={28} style={{color:'#f97316'}} />
         </div>
         <h3 className="font-display font-700 text-xl text-white mb-2">Account Created!</h3>
         <p className="text-gray-400 text-sm">Taking you to your dashboard...</p>
@@ -162,9 +162,9 @@ export function SignupForm() {
 
       <p className="text-xs text-gray-600 text-center">
         By signing up you agree to our{' '}
-        <a href="/terms" className="text-brand-400/70 hover:text-brand-400">Terms</a>{' '}
+        <a href="/terms" style={{color:'rgba(249,115,22,0.7)'}}>Terms</a>{' '}
         and{' '}
-        <a href="/privacy" className="text-brand-400/70 hover:text-brand-400">Privacy Policy</a>
+        <a href="/privacy" style={{color:'rgba(249,115,22,0.7)'}}>Privacy Policy</a>
       </p>
     </form>
   )

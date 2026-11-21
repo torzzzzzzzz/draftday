@@ -71,7 +71,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
           </button>
         </div>
         <div className="mt-1 text-right">
-          <Link href="/auth/forgot-password" className="text-xs text-brand-400 hover:text-brand-300">
+          <Link href="/auth/forgot-password" style={{fontSize:'0.75rem',color:'#f97316'}}>
             Forgot password?
           </Link>
         </div>

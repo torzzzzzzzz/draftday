@@ -65,8 +65,8 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
             <div key={stage} className="flex items-center">
               <div className={`flex flex-col items-center ${i <= stageIndex ? 'opacity-100' : 'opacity-30'}`}>
                 <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg ${
-                  i < stageIndex ? 'bg-brand-500 border-brand-500' :
-                  i === stageIndex ? 'border-brand-500 bg-brand-500/20' :
+                  i < stageIndex ? 'bg-orange-500 border-orange-500' :
+                  i === stageIndex ? 'border-orange-500 bg-orange-500/20' :
                   'border-white/10 bg-white/5'
                 }`}>
                   {i < stageIndex ? '✓' :
@@ -74,12 +74,12 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
                    stage === 'college' ? '🎓' :
                    stage === 'nfl' ? '🏈' : '🏛️'}
                 </div>
-                <div className={`text-xs mt-1 font-medium ${i === stageIndex ? 'text-brand-400' : 'text-gray-500'}`}>
+                <div className={`text-xs mt-1 font-medium ${i === stageIndex ? 'text-orange-400' : 'text-gray-500'}`}>
                   {STAGE_LABEL[stage]}
                 </div>
               </div>
               {i < STAGE_ORDER.length - 1 && (
-                <div className={`h-0.5 w-8 sm:w-16 mx-2 ${i < stageIndex ? 'bg-brand-500' : 'bg-white/10'}`} />
+                <div className={`h-0.5 w-8 sm:w-16 mx-2 ${i < stageIndex ? 'bg-orange-500' : 'bg-white/10'}`} />
               )}
             </div>
           ))}
@@ -134,7 +134,7 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
                 </div>
               )}
               {career.all_pro_selections > 0 && (
-                <div className="flex items-center gap-2 text-sm text-brand-400">
+                <div className="flex items-center gap-2 text-sm text-orange-400">
                   🏆 {career.all_pro_selections}× All-Pro
                 </div>
               )}
@@ -159,7 +159,7 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
               <div className="text-xs text-gray-500">Year</div>
             </div>
             <div className="card p-4 text-center">
-              <div className="text-2xl font-display font-900 text-brand-400">{career.season_wins ?? 0}</div>
+              <div className="text-2xl font-display font-900 text-orange-400">{career.season_wins ?? 0}</div>
               <div className="text-xs text-gray-500">Season Wins</div>
             </div>
             <div className="card p-4 text-center">
@@ -177,8 +177,8 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
             {recentGames && recentGames.length > 0 ? (
               <div className="space-y-2">
                 {recentGames.map((game, i) => (
-                  <div key={game.id} className={`flex items-center gap-3 p-3 rounded-xl ${game.won ? 'bg-brand-500/5' : 'bg-red-500/5'}`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-display font-900 ${game.won ? 'bg-brand-500 text-white' : 'bg-red-500/20 text-red-400'}`}>
+                  <div key={game.id} className={`flex items-center gap-3 p-3 rounded-xl ${game.won ? 'bg-orange-500/5' : 'bg-red-500/5'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-display font-900 ${game.won ? 'bg-orange-500 text-white' : 'bg-red-500/20 text-red-400'}`}>
                       {game.won ? 'W' : 'L'}
                     </div>
                     <div className="flex-1">
@@ -189,7 +189,7 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
                         {new Date(game.played_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className={`text-xs font-medium ${game.won ? 'text-brand-400' : 'text-gray-500'}`}>
+                    <div className={`text-xs font-medium ${game.won ? 'text-orange-400' : 'text-gray-500'}`}>
                       {game.won ? '+XP' : ''}
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export default async function CareerDetailPage({ params }: { params: { id: strin
               </div>
             ) : (
               <div className="text-center py-6 text-gray-500 text-sm">
-                No games played yet. <Link href={`/play/simple?career=${career.id}`} className="text-brand-400 hover:text-brand-300">Start playing!</Link>
+                No games played yet. <Link href={`/play/simple?career=${career.id}`} className="text-orange-400 hover:text-orange-300">Start playing!</Link>
               </div>
             )}
           </div>

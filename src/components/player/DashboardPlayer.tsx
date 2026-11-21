@@ -125,7 +125,7 @@ export function DashboardPlayer({ player, career }: { player: any; career: any }
       <div className="flex border-t border-white/5">
         <Link
           href="/career"
-          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm text-gray-400 hover:text-brand-400 hover:bg-brand-500/5 transition-all"
+          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm text-gray-400 hover:text-orange-400 hover:bg-orange-500/5 transition-all"
         >
           <Trophy size={15} />
           Career
@@ -134,7 +134,7 @@ export function DashboardPlayer({ player, career }: { player: any; career: any }
         <div className="w-px bg-white/5" />
         <Link
           href="/play"
-          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm text-brand-400 hover:bg-brand-500/10 transition-all font-medium"
+          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm text-orange-400 hover:bg-orange-500/10 transition-all font-medium"
         >
           <TrendingUp size={15} />
           Play Game

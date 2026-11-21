@@ -53,7 +53,7 @@ export default async function FriendsPage() {
               name="username"
               type="text"
               placeholder="Search by username…"
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-brand-500 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-orange-500 transition-colors"
             />
           </div>
           <button type="submit" className="btn btn-primary px-4">
@@ -67,7 +67,7 @@ export default async function FriendsPage() {
         <div className="mb-6">
           <h2 className="font-display font-700 text-xl text-white mb-3">
             Friend Requests
-            <span className="ml-2 text-sm bg-brand-500 text-white rounded-full px-2 py-0.5">{incoming.length}</span>
+            <span className="ml-2 text-sm bg-orange-500 text-white rounded-full px-2 py-0.5">{incoming.length}</span>
           </h2>
           <div className="space-y-3">
             {incoming.map(f => {
@@ -111,7 +111,7 @@ export default async function FriendsPage() {
               const friend = getFriend(f)
               return (
                 <div key={f.id} className="card p-4 flex items-center gap-3 card-hover">
-                  <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-lg font-display font-900 text-brand-400">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-lg font-display font-900 text-orange-400">
                     {friend?.username?.[0]?.toUpperCase() ?? '?'}
                   </div>
                   <div className="flex-1">

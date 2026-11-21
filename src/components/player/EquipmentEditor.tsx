@@ -76,7 +76,7 @@ function EquipmentSection({ title, items, value, field, onChange, isNullable = f
             onClick={() => onChange({ [field]: id === 'none' ? null : id })}
             className={`px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
               (value === id || (id === 'none' && value === null))
-                ? 'border-brand-400 bg-brand-500/15 text-brand-400'
+                ? 'border-orange-400 bg-orange-500/15 text-orange-400'
                 : 'border-white/10 text-gray-400 hover:border-white/25 hover:text-white'
             }`}
           >

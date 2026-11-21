@@ -67,7 +67,7 @@ export function AppearanceEditor({ build, onChange }: AppearanceEditorProps) {
                 title={label}
                 onClick={() => onChange({ skin_tone: id })}
                 className={`w-8 h-8 rounded-full border-2 transition-all ${
-                  build.skin_tone === id ? 'border-brand-400 scale-110' : 'border-transparent hover:border-white/30'
+                  build.skin_tone === id ? 'border-orange-400 scale-110' : 'border-transparent hover:border-white/30'
                 }`}
                 style={{ backgroundColor: hex }}
               />
@@ -85,7 +85,7 @@ export function AppearanceEditor({ build, onChange }: AppearanceEditorProps) {
                 onClick={() => onChange({ hair_style: id })}
                 className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
                   build.hair_style === id
-                    ? 'border-brand-400 bg-brand-500/15 text-brand-400'
+                    ? 'border-orange-400 bg-orange-500/15 text-orange-400'
                     : 'border-white/10 text-gray-400 hover:border-white/25 hover:text-white'
                 }`}
               >
@@ -106,7 +106,7 @@ export function AppearanceEditor({ build, onChange }: AppearanceEditorProps) {
                   title={label}
                   onClick={() => onChange({ hair_color: id })}
                   className={`w-8 h-8 rounded-full border-2 transition-all ${
-                    build.hair_color === id ? 'border-brand-400 scale-110' : 'border-transparent hover:border-white/30'
+                    build.hair_color === id ? 'border-orange-400 scale-110' : 'border-transparent hover:border-white/30'
                   }`}
                   style={{ backgroundColor: hex }}
                 />
@@ -125,7 +125,7 @@ export function AppearanceEditor({ build, onChange }: AppearanceEditorProps) {
                 onClick={() => onChange({ face_style: id })}
                 className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
                   build.face_style === id
-                    ? 'border-brand-400 bg-brand-500/15 text-brand-400'
+                    ? 'border-orange-400 bg-orange-500/15 text-orange-400'
                     : 'border-white/10 text-gray-400 hover:border-white/25 hover:text-white'
                 }`}
               >

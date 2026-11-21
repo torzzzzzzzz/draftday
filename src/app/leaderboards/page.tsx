@@ -35,8 +35,8 @@ export default async function LeaderboardsPage() {
           </div>
         </div>
         <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
-            <TrendingUp size={20} className="text-brand-400" />
+          <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+            <TrendingUp size={20} className="text-orange-400" />
           </div>
           <div>
             <div className="text-2xl font-display font-900 text-white">94</div>

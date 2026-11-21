@@ -99,7 +99,7 @@ export default async function PlayPage() {
 
       {/* Active career info */}
       {careers[0] && (
-        <div className="card p-5 mb-6 border-brand-500/20">
+        <div className="card p-5 mb-6 border-orange-500/20">
           {(() => {
             const career = careers[0]
             const player = career.players as any
@@ -112,7 +112,7 @@ export default async function PlayPage() {
                   #{player.jersey_number}
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs text-brand-400 font-display font-700 uppercase tracking-wide mb-0.5">
+                  <div className="text-xs text-orange-400 font-display font-700 uppercase tracking-wide mb-0.5">
                     {career.stage?.replace(/_/g, ' ')} · Year {career.current_year}
                   </div>
                   <div className="font-display font-800 text-2xl text-white">{player.name}</div>

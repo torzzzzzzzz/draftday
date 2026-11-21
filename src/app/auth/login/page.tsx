@@ -14,15 +14,15 @@ export default function LoginPage({
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-brand-500/20">
-            <span className="font-display font-900 text-2xl text-white">DD</span>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{background:'linear-gradient(135deg,#f97316,#ea580c)',boxShadow:'0 0 32px rgba(249,115,22,0.3)'}}>
+            <span style={{fontFamily:'Barlow Condensed,sans-serif',fontWeight:900,fontSize:'1.5rem',color:'#fff'}}>DD</span>
           </div>
-          <h1 className="font-display text-4xl font-800 text-white">Welcome Back</h1>
-          <p className="text-gray-400 mt-2">Sign in to continue your career</p>
+          <h1 style={{fontFamily:'Barlow Condensed,sans-serif',fontWeight:800,fontSize:'2.25rem',color:'#f8f4ef'}}>Welcome Back</h1>
+          <p style={{color:'#8ba0c4',marginTop:'0.5rem'}}>Sign in to continue your career</p>
         </div>
 
         {searchParams.message && (
-          <div className="mb-4 p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-brand-400 text-sm text-center">
+          <div className="mb-4 p-3 rounded-xl text-sm text-center" style={{background:'rgba(249,115,22,0.1)',border:'1px solid rgba(249,115,22,0.2)',color:'#f97316'}}>
             {searchParams.message}
           </div>
         )}
@@ -33,7 +33,7 @@ export default function LoginPage({
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-brand-400 hover:text-brand-300 font-medium">
+          <Link href="/auth/signup" style={{color:'#f97316',fontWeight:500}}>
             Sign up for free
           </Link>
         </p>

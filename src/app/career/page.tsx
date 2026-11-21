@@ -58,7 +58,7 @@ export default async function CareerPage({
       </div>
 
       {searchParams.new === 'true' && (
-        <div className="mb-6 p-4 bg-brand-500/10 border border-brand-500/20 rounded-xl text-brand-400">
+        <div className="mb-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-400">
           🎉 Welcome to your career! Start by playing your first game.
         </div>
       )}

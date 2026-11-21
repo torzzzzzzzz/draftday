@@ -30,8 +30,8 @@ const positionColors: Record<Position, string> = {
   LB: 'from-purple-600 to-purple-500',
   CB: 'from-teal-600 to-teal-500',
   S: 'from-cyan-600 to-cyan-500',
-  K: 'from-brand-600 to-brand-500',
-  P: 'from-brand-700 to-brand-600',
+  K: 'from-orange-600 to-orange-500',
+  P: 'from-orange-700 to-orange-600',
 }
 
 interface PositionSelectorProps {
@@ -56,14 +56,14 @@ export function PositionSelector({ value, onChange }: PositionSelectorProps) {
                 onClick={() => onChange(pos)}
                 className={`p-3 rounded-xl border-2 transition-all text-center ${
                   value === pos
-                    ? 'border-brand-400 bg-brand-500/15'
+                    ? 'border-orange-400 bg-orange-500/15'
                     : 'border-white/10 hover:border-white/25 hover:bg-white/5'
                 }`}
               >
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${positionColors[pos]} flex items-center justify-center mx-auto mb-1.5`}>
                   <span className="font-display font-800 text-sm text-white">{label}</span>
                 </div>
-                <span className={`text-xs font-medium ${value === pos ? 'text-brand-400' : 'text-gray-400'}`}>
+                <span className={`text-xs font-medium ${value === pos ? 'text-orange-400' : 'text-gray-400'}`}>
                   {label}
                 </span>
               </button>
@@ -73,13 +73,13 @@ export function PositionSelector({ value, onChange }: PositionSelectorProps) {
       ))}
 
       {selected && (
-        <div className="card p-4 border border-brand-500/20 bg-brand-500/5">
+        <div className="card p-4 border border-orange-500/20 bg-orange-500/5">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${positionColors[selected.pos]} flex items-center justify-center shrink-0`}>
               <span className="font-display font-800 text-lg text-white">{selected.pos}</span>
             </div>
             <div>
-              <p className="text-brand-400 font-medium text-sm">{selected.label} selected</p>
+              <p className="text-orange-400 font-medium text-sm">{selected.label} selected</p>
               <p className="text-gray-400 text-xs mt-0.5">{selected.desc}</p>
             </div>
           </div>

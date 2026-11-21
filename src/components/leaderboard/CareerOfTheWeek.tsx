@@ -23,7 +23,7 @@ export function CareerOfTheWeek({ preview = false }: CareerOfTheWeekProps) {
             <Trophy size={18} className="text-amber-400" />
             <h3 className="font-display font-700 text-lg text-white">Career of the Week</h3>
           </div>
-          <Link href="/leaderboards" className="text-xs text-brand-400 hover:text-brand-300">
+          <Link href="/leaderboards" className="text-xs text-orange-400 hover:text-orange-300">
             View all →
           </Link>
         </div>
@@ -51,7 +51,7 @@ export function CareerOfTheWeek({ preview = false }: CareerOfTheWeekProps) {
 
               {/* Stats */}
               <div className="text-right shrink-0">
-                <div className="text-sm font-display font-800 text-brand-400">{entry.overall}</div>
+                <div className="text-sm font-display font-800 text-orange-400">{entry.overall}</div>
                 <div className="text-xs text-amber-400">🏆 ×{entry.superBowls}</div>
               </div>
             </div>
@@ -118,7 +118,7 @@ export function CareerOfTheWeek({ preview = false }: CareerOfTheWeekProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-white font-medium">{entry.playerName}</span>
-                <span className="text-xs bg-brand-500/10 text-brand-400 rounded px-1.5 py-0.5">{entry.position}</span>
+                <span className="text-xs bg-orange-500/10 text-orange-400 rounded px-1.5 py-0.5">{entry.position}</span>
               </div>
               <div className="text-xs text-gray-500">by @{entry.name} · {entry.superBowls} Super Bowl{entry.superBowls !== 1 ? 's' : ''}</div>
             </div>

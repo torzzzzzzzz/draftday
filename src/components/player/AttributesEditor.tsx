@@ -158,7 +158,7 @@ export function AttributesEditor({ position, build, onChange }: AttributesEditor
         </div>
       )}
 
-      <div className="p-3 bg-brand-500/5 border border-brand-500/15 rounded-xl">
+      <div className="p-3 bg-orange-500/5 border border-orange-500/15 rounded-xl">
         <p className="text-xs text-gray-500">
           💡 These are your starting attributes. Throughout your career, winning games, completing challenges, and training sessions will increase them.
         </p>

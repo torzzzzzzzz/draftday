@@ -47,7 +47,7 @@ export default async function ProfilePage({ params }: { params: { username: stri
       <div className="card p-6 mb-6">
         <div className="flex items-start gap-5">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-2xl bg-brand-500/20 border-2 border-brand-500/30 flex items-center justify-center text-4xl font-display font-900 text-brand-400 shrink-0">
+          <div className="w-20 h-20 rounded-2xl bg-orange-500/20 border-2 border-orange-500/30 flex items-center justify-center text-4xl font-display font-900 text-orange-400 shrink-0">
             {profile.username[0].toUpperCase()}
           </div>
 
@@ -88,7 +88,7 @@ export default async function ProfilePage({ params }: { params: { username: stri
               <div className="text-xs text-gray-500">HOF</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-display font-900 text-brand-400">{profile.level}</div>
+              <div className="text-2xl font-display font-900 text-orange-400">{profile.level}</div>
               <div className="text-xs text-gray-500">Level</div>
             </div>
           </div>

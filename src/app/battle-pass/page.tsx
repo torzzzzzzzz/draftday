@@ -42,7 +42,7 @@ export default async function BattlePassPage() {
       <div className="mb-6">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-xs text-brand-400 font-display font-700 tracking-widest mb-1">SEASON 1</div>
+            <div className="text-xs text-orange-400 font-display font-700 tracking-widest mb-1">SEASON 1</div>
             <h1 className="font-display text-5xl font-800 text-white">BATTLE PASS</h1>
             <p className="text-gray-400 mt-1">Earn XP to unlock rewards across 100 tiers</p>
           </div>
@@ -98,15 +98,15 @@ export default async function BattlePassPage() {
               key={tier.id}
               className={`relative rounded-xl border p-2 text-center transition-all ${
                 isCurrent
-                  ? 'border-brand-500 bg-brand-500/10 scale-105 z-10'
+                  ? 'border-orange-500 bg-orange-500/10 scale-105 z-10'
                   : isUnlocked
-                  ? 'border-brand-500/20 bg-brand-500/5'
+                  ? 'border-orange-500/20 bg-orange-500/5'
                   : 'border-white/5 bg-white/2 opacity-60'
               }`}
             >
               {/* Tier number */}
               <div className={`text-xs font-display font-800 mb-1 ${
-                isCurrent ? 'text-brand-400' : isUnlocked ? 'text-brand-500/70' : 'text-gray-600'
+                isCurrent ? 'text-orange-400' : isUnlocked ? 'text-orange-500/70' : 'text-gray-600'
               }`}>
                 {tier.tier_number}
               </div>
@@ -131,7 +131,7 @@ export default async function BattlePassPage() {
               {/* Completed check */}
               {isUnlocked && (
                 <div className="absolute top-1 right-1">
-                  <CheckCircle size={10} className="text-brand-500" />
+                  <CheckCircle size={10} className="text-orange-500" />
                 </div>
               )}
 
@@ -155,7 +155,7 @@ export default async function BattlePassPage() {
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 mt-6 text-xs text-gray-500">
         <div className="flex items-center gap-1.5"><Star size={10} className="text-amber-500" /> Premium reward</div>
-        <div className="flex items-center gap-1.5"><CheckCircle size={10} className="text-brand-500" /> Unlocked</div>
+        <div className="flex items-center gap-1.5"><CheckCircle size={10} className="text-orange-500" /> Unlocked</div>
         {Object.entries(RARITY_COLORS).map(([rarity, color]) => (
           <div key={rarity} className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full" style={{ background: color }} />

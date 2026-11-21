@@ -27,7 +27,7 @@ export default async function SettingsPage() {
       {/* Profile */}
       <div className="card mb-4">
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
-          <User size={16} className="text-brand-400" />
+          <User size={16} className="text-orange-400" />
           <h2 className="font-display font-700 text-sm text-white uppercase tracking-wider">Profile</h2>
         </div>
         <form action="/api/settings/update-profile" method="POST" className="p-5 space-y-4">
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
               type="text"
               defaultValue={profile?.display_name ?? ''}
               maxLength={50}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500 transition-colors"
             />
           </div>
           <div>
@@ -49,7 +49,7 @@ export default async function SettingsPage() {
               defaultValue={profile?.username ?? ''}
               pattern="[a-zA-Z0-9_]{3,20}"
               maxLength={20}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500 transition-colors"
             />
             <p className="text-xs text-gray-600 mt-1">3–20 chars, letters/numbers/underscore only</p>
           </div>
@@ -61,7 +61,7 @@ export default async function SettingsPage() {
               maxLength={160}
               rows={3}
               placeholder="Tell other players about yourself…"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition-colors resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500 transition-colors resize-none"
             />
           </div>
           <button type="submit" className="btn btn-primary">Save Changes</button>
@@ -71,7 +71,7 @@ export default async function SettingsPage() {
       {/* Account */}
       <div className="card mb-4">
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
-          <Shield size={16} className="text-brand-400" />
+          <Shield size={16} className="text-orange-400" />
           <h2 className="font-display font-700 text-sm text-white uppercase tracking-wider">Account</h2>
         </div>
         <div className="p-5 space-y-4">
@@ -92,7 +92,7 @@ export default async function SettingsPage() {
                 type="password"
                 placeholder="New password (min 8 chars)"
                 minLength={8}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500 transition-colors"
               />
               <button type="submit" className="btn btn-secondary text-sm">Update Password</button>
             </form>
@@ -103,7 +103,7 @@ export default async function SettingsPage() {
       {/* Notifications */}
       <div className="card mb-4">
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
-          <Bell size={16} className="text-brand-400" />
+          <Bell size={16} className="text-orange-400" />
           <h2 className="font-display font-700 text-sm text-white uppercase tracking-wider">Notifications</h2>
         </div>
         <div className="p-5 space-y-3">
@@ -118,7 +118,7 @@ export default async function SettingsPage() {
               <span className="text-sm text-gray-300">{label}</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500" />
+                <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500" />
               </label>
             </div>
           ))}

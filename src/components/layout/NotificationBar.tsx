@@ -75,25 +75,25 @@ export function NotificationBar({ userId }: { userId: string }) {
     <div className="fixed top-4 right-16 z-50 md:right-4">
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-xl glass border border-white/10 hover:border-brand-500/30 transition-all"
+        className="relative p-2 rounded-xl glass border border-white/10 hover:border-orange-500/30 transition-all"
       >
         <Bell size={18} className="text-gray-400" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-500 rounded-full text-xs font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full text-xs font-bold text-white flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 glass border border-brand-500/20 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="absolute right-0 top-full mt-2 w-80 glass border border-orange-500/20 rounded-2xl overflow-hidden shadow-2xl">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
             <h3 className="font-semibold text-sm">Notifications</h3>
             <div className="flex items-center gap-2">
               {unread > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1"
+                  className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1"
                 >
                   <Check size={12} />
                   Mark all read
@@ -118,13 +118,13 @@ export function NotificationBar({ userId }: { userId: string }) {
                     key={notif.id}
                     onClick={() => markRead(notif.id)}
                     className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-white/5 transition-all border-b border-white/5 last:border-0 ${
-                      !notif.read ? 'bg-brand-500/5' : ''
+                      !notif.read ? 'bg-orange-500/5' : ''
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                      !notif.read ? 'bg-brand-500/20' : 'bg-white/5'
+                      !notif.read ? 'bg-orange-500/20' : 'bg-white/5'
                     }`}>
-                      <Icon size={14} className={!notif.read ? 'text-brand-400' : 'text-gray-500'} />
+                      <Icon size={14} className={!notif.read ? 'text-orange-400' : 'text-gray-500'} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium ${!notif.read ? 'text-white' : 'text-gray-300'}`}>
@@ -138,7 +138,7 @@ export function NotificationBar({ userId }: { userId: string }) {
                       </p>
                     </div>
                     {!notif.read && (
-                      <div className="w-2 h-2 rounded-full bg-brand-400 shrink-0 mt-2" />
+                      <div className="w-2 h-2 rounded-full bg-orange-400 shrink-0 mt-2" />
                     )}
                   </button>
                 )
